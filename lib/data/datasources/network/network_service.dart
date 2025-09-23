@@ -10,8 +10,8 @@ import 'package:uuid/uuid.dart';
 
 class NetworkService {
   static bool _isTester = true;
-  static final _serverDev = "http://131.153.18.44:8080";
-  static final _serverProd = "http://131.153.18.44:8080";
+  static final _serverDev = "https://hilol-market.kr";
+  static final _serverProd = "https://hilol-market.kr";
 
   static String get getService {
     if (_isTester) return _serverDev;
@@ -100,7 +100,12 @@ class NetworkService {
     Map<String, dynamic>? queryParameters,
   ]) async {
     try {
-      var response = await _dio.put(api, data: data, queryParameters: queryParameters, cancelToken: cancelToken);
+      var response = await _dio.put(
+        api,
+        data: data,
+        queryParameters: queryParameters,
+        cancelToken: cancelToken,
+      );
       return response.data;
     } on DioException catch (e) {
       throw NetworkException.fromDioError(e);
@@ -148,19 +153,27 @@ class NetworkService {
   static final String apiLogin = "/api/v1/auth/login";
   static final String apiRefreshToken = "/api/v1/auth/refresh-token";
 
-  static final String apiFetchCategories = "/api/v1/admin/product-category/get-all";
-  static final String apiCreateCategory = "/api/v1/admin/product-category/create";
+  static final String apiFetchCategories =
+      "/api/v1/admin/product-category/get-all";
+  static final String apiCreateCategory =
+      "/api/v1/admin/product-category/create";
   static final String apiEditCategory = "/api/v1/admin/product-category/edit";
-  static final String apiDeleteCategory = "/api/v1/admin/product-category/delete";
+  static final String apiDeleteCategory =
+      "/api/v1/admin/product-category/delete";
 
   static final String apiFetchProducts = "/api/v1/admin/product/get-all";
   static final String apiCreateProduct = "/api/v1/admin/product/create";
   static final String apiEditProduct = "/api/v1/admin/product/edit";
   static final String apiDeleteProduct = "/api/v1/admin/product/delete";
-  static final String apiUploadImageProduct = "/api/v1/admin/product/upload-images";
+  static final String apiUploadCategoryIcon =
+      "/api/v1/admin/product-category/upload-icon";
+  static final String apiUploadImageProduct =
+      "/api/v1/admin/product/upload-images";
 
   static final String apiFetchMeasurement = "/api/v1/measurement/all";
-  static String apiFileDownload(String identity) => "/api/v1/file/download?identity=$identity";
+  static String apiFileDownload(String identity) =>
+      "/api/v1/file/download?identity=$identity";
+  static final String apiFetchOrders = "/api/v1/admin/order/get-all";
 
   /* Http Params */
   static Map<String, dynamic> paramsLogin(String phone, String password) {
@@ -182,10 +195,10 @@ class NetworkService {
   }
 
   static Map<String, dynamic> paramsEditCategory(int categoryId) {
-    return { "categoryId": categoryId };
+    return {"categoryId": categoryId};
   }
 
   static Map<String, dynamic> paramsEditProduct(int productId) {
-    return { "productId": productId };
+    return {"productId": productId};
   }
 }

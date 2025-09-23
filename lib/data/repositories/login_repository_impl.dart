@@ -18,15 +18,18 @@ class LoginRepositoryImpl extends LoginRepository {
     try {
       final api = NetworkService.apiLogin;
       final cancelToken = cancelTokenManager.getToken(api);
-      final response = await NetworkService.post(api, cancelToken, NetworkService.paramsLogin(phone, password));
-
+      final response = await NetworkService.post(
+        api,
+        cancelToken,
+        NetworkService.paramsLogin(phone, password),
+      );
       DBService.ensure.setRefreshToken(response["data"]["refreshToken"]);
       DBService.ensure.setAccessToken(response["data"]["accessToken"]);
       DBService.ensure.setClientId(response["data"]["clientId"]);
       final result = response['success'];
       return Right(result);
-    } on NetworkException catch(e) {
-      if(e.type != NetworkExceptionType.cancelled) {
+    } on NetworkException catch (e) {
+      if (e.type != NetworkExceptionType.cancelled) {
         GlobalSnackBar.showError(e.message);
       }
       return Left(e.toString());
@@ -39,19 +42,26 @@ class LoginRepositoryImpl extends LoginRepository {
   void dispose() => cancelTokenManager.cancelAll();
 
   @override
-  Future<Either<String, bool>> onRefreshToken(String clientId, String refreshToken) async {
+  Future<Either<String, bool>> onRefreshToken(
+    String clientId,
+    String refreshToken,
+  ) async {
     try {
       final api = NetworkService.apiRefreshToken;
       final cancelToken = cancelTokenManager.getToken(api);
-      final response = await NetworkService.post(api, cancelToken, NetworkService.paramsRefreshToken(clientId, refreshToken));
+      final response = await NetworkService.post(
+        api,
+        cancelToken,
+        NetworkService.paramsRefreshToken(clientId, refreshToken),
+      );
 
       DBService.ensure.setRefreshToken(response["data"]["refreshToken"]);
       DBService.ensure.setAccessToken(response["data"]["accessToken"]);
       DBService.ensure.setClientId(response["data"]["clientId"]);
       final result = response['success'];
       return Right(result);
-    } on NetworkException catch(e) {
-      if(e.type != NetworkExceptionType.cancelled) {
+    } on NetworkException catch (e) {
+      if (e.type != NetworkExceptionType.cancelled) {
         GlobalSnackBar.showError(e.message);
       }
       return Left(e.toString());
@@ -59,5 +69,4 @@ class LoginRepositoryImpl extends LoginRepository {
       return Left(e.toString());
     }
   }
-
 }
