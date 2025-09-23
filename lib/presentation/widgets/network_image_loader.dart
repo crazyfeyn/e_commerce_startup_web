@@ -49,7 +49,8 @@ class _ImageCarouselState extends State<ImageCarousel> {
               return SizedBox(
                 width: double.infinity,
                 child: NetworkImageLoader(
-                  url: "${NetworkService.getService}${NetworkService.apiFileDownload(widget.urls[index])}",
+                  url:
+                      "${NetworkService.getService}${NetworkService.apiFileDownload(widget.urls[index])}",
                 ),
               );
             },
@@ -75,7 +76,6 @@ class _ImageCarouselState extends State<ImageCarousel> {
     );
   }
 }
-
 
 class NetworkImageLoader extends StatefulWidget {
   final String url;
@@ -119,7 +119,6 @@ class _NetworkImageLoaderState extends State<NetworkImageLoader> {
         options: Options(responseType: ResponseType.bytes),
       );
       final bytes = Uint8List.fromList(response.data!);
-
       // Cache ga yozib qo‘yamiz
       _MemoryImageCache.set(widget.url, bytes);
 

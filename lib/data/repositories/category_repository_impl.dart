@@ -1,10 +1,12 @@
 import 'package:dartz/dartz.dart';
+import 'package:dio/dio.dart';
 import 'package:e_commerce_startup_web/core/utils/app_snackbar.dart';
 import 'package:e_commerce_startup_web/data/datasources/network/cancel_token_manager.dart';
 import 'package:e_commerce_startup_web/data/datasources/network/network_helper.dart';
 import 'package:e_commerce_startup_web/data/datasources/network/network_service.dart';
 import 'package:e_commerce_startup_web/data/models/category_model.dart';
 import 'package:e_commerce_startup_web/domain/repositories/category_repository.dart';
+import 'dart:typed_data';
 
 class CategoryRepositoryImpl extends CategoryRepository {
   late final CancelTokenManager cancelTokenManager;
@@ -19,10 +21,12 @@ class CategoryRepositoryImpl extends CategoryRepository {
       final api = NetworkService.apiFetchCategories;
       final cancelToken = cancelTokenManager.getToken(api);
       final response = await NetworkService.get(api, cancelToken);
-      final result = response["data"]["list"].map<CategoryModel>((e) => CategoryModel.fromMap(e)).toList();
+      final result = response["data"]["list"]
+          .map<CategoryModel>((e) => CategoryModel.fromMap(e))
+          .toList();
       return Right(result);
-    } on NetworkException catch(e) {
-      if(e.type != NetworkExceptionType.cancelled) {
+    } on NetworkException catch (e) {
+      if (e.type != NetworkExceptionType.cancelled) {
         GlobalSnackBar.showError(e.message);
       }
       return Left(e.toString());
@@ -32,15 +36,29 @@ class CategoryRepositoryImpl extends CategoryRepository {
   }
 
   @override
-  Future<Either<String, bool>> createCategory(Map<String, dynamic> title, String prompt) async {
+  Future<Either<String, int?>> createCategory(
+    Map<String, dynamic> title,
+    String prompt,
+  ) async {
     try {
       final api = NetworkService.apiCreateCategory;
       final cancelToken = cancelTokenManager.getToken(api);
-      final response = await NetworkService.post(api, cancelToken, NetworkService.paramsCategory(title, prompt));
-      final result = response["success"];
-      return Right(result);
-    } on NetworkException catch(e) {
-      if(e.type != NetworkExceptionType.cancelled) {
+      final response = await NetworkService.post(
+        api,
+        cancelToken,
+        NetworkService.paramsCategory(title, prompt),
+      );
+
+      final success = response["success"];
+      if (success) {
+        final categoryId =
+            response["data"]?["id"] ?? response["data"]?["categoryId"];
+        return Right(categoryId);
+      } else {
+        return Left("Failed to create category");
+      }
+    } on NetworkException catch (e) {
+      if (e.type != NetworkExceptionType.cancelled) {
         GlobalSnackBar.showError(e.message);
       }
       return Left(e.toString());
@@ -50,15 +68,54 @@ class CategoryRepositoryImpl extends CategoryRepository {
   }
 
   @override
-  Future<Either<String, bool>> editCategory(int categoryId, Map<String, dynamic> title, String prompt) async {
+  Future<Either<String, bool>> uploadIcon({
+    required int categoryId,
+    required Uint8List iconFile,
+    required String fileName,
+  }) async {
+    try {
+      final api = NetworkService.apiUploadCategoryIcon;
+      final cancelToken = cancelTokenManager.getToken(api);
+
+      final formData = FormData.fromMap({
+        'file': MultipartFile.fromBytes(iconFile, filename: fileName),
+      });
+
+      final response = await NetworkService.post(api, cancelToken, formData, {
+        'categoryId': categoryId.toString(),
+      });
+
+      final result = response?["success"] ?? false;
+      return Right(result);
+    } on NetworkException catch (e) {
+      if (e.type != NetworkExceptionType.cancelled) {
+        GlobalSnackBar.showError(e.message);
+      }
+      return Left(e.toString());
+    } catch (e) {
+      return Left(e.toString());
+    }
+  }
+
+  @override
+  Future<Either<String, bool>> editCategory(
+    int categoryId,
+    Map<String, dynamic> title,
+    String prompt,
+  ) async {
     try {
       final api = NetworkService.apiEditCategory;
       final cancelToken = cancelTokenManager.getToken(api);
-      final response = await NetworkService.put(api, cancelToken, NetworkService.paramsCategory(title, prompt), NetworkService.paramsEditCategory(categoryId));
+      final response = await NetworkService.put(
+        api,
+        cancelToken,
+        NetworkService.paramsCategory(title, prompt),
+        NetworkService.paramsEditCategory(categoryId),
+      );
       final result = response["success"];
       return Right(result);
-    } on NetworkException catch(e) {
-      if(e.type != NetworkExceptionType.cancelled) {
+    } on NetworkException catch (e) {
+      if (e.type != NetworkExceptionType.cancelled) {
         GlobalSnackBar.showError(e.message);
       }
       return Left(e.toString());
@@ -72,11 +129,15 @@ class CategoryRepositoryImpl extends CategoryRepository {
     try {
       final api = NetworkService.apiDeleteCategory;
       final cancelToken = cancelTokenManager.getToken(api);
-      final response = await NetworkService.delete(api, cancelToken, NetworkService.paramsEditCategory(categoryId));
+      final response = await NetworkService.delete(
+        api,
+        cancelToken,
+        NetworkService.paramsEditCategory(categoryId),
+      );
       final result = response["success"];
       return Right(result);
-    } on NetworkException catch(e) {
-      if(e.type != NetworkExceptionType.cancelled) {
+    } on NetworkException catch (e) {
+      if (e.type != NetworkExceptionType.cancelled) {
         GlobalSnackBar.showError(e.message);
       }
       return Left(e.toString());
