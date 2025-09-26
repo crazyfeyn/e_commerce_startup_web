@@ -3,7 +3,7 @@ import 'package:e_commerce_startup_web/core/utils/app_colors.dart';
 import 'package:e_commerce_startup_web/core/utils/app_styles.dart';
 import 'package:e_commerce_startup_web/core/utils/locale_keys.g.dart';
 import 'package:e_commerce_startup_web/presentation/pages/categories/page/categories_page.dart';
-import 'package:e_commerce_startup_web/presentation/pages/cities/page/cities_page.dart';
+import 'package:e_commerce_startup_web/presentation/pages/sold_products/page/sold_products.dart';
 import 'package:e_commerce_startup_web/presentation/pages/orders/page/orders_page.dart';
 import 'package:e_commerce_startup_web/presentation/pages/products/page/products_page.dart';
 import 'package:easy_localization/easy_localization.dart';
@@ -49,16 +49,23 @@ class _AdminShellState extends State<AdminShell> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: kIsWeb ? null : AppBar(title: Text(context.tr(LocaleKeys.admin_panel))),
+      appBar: kIsWeb
+          ? null
+          : AppBar(title: Text(context.tr(LocaleKeys.admin_panel))),
       body: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           SideMenu(
             controller: sideMenu,
-            title: kIsWeb ? Container(
-              padding: EdgeInsets.symmetric(vertical: 24, horizontal: 12),
-              child: Text(context.tr(LocaleKeys.admin_panel), style: AppStyles.bodyXLSemibold),
-            ) : null,
+            title: kIsWeb
+                ? Container(
+                    padding: EdgeInsets.symmetric(vertical: 24, horizontal: 12),
+                    child: Text(
+                      context.tr(LocaleKeys.admin_panel),
+                      style: AppStyles.bodyXLSemibold,
+                    ),
+                  )
+                : null,
             style: SideMenuStyle(
               displayMode: SideMenuDisplayMode.auto,
               hoverColor: AppColors.black200,
@@ -66,7 +73,9 @@ class _AdminShellState extends State<AdminShell> {
               selectedColor: AppColors.primary600,
               selectedTitleTextStyle: const TextStyle(color: AppColors.white50),
               selectedIconColor: AppColors.white50,
-              selectedTitleTextStyleExpandable: const TextStyle(color: AppColors.primary600),
+              selectedTitleTextStyleExpandable: const TextStyle(
+                color: AppColors.primary600,
+              ),
               backgroundColor: AppColors.black100,
             ),
             items: [
@@ -109,7 +118,7 @@ class _AdminShellState extends State<AdminShell> {
       0 => OrdersPage.path,
       1 => CategoriesPage.path,
       2 => ProductsPage.path,
-      3 => CitiesPage.path,
+      3 => SoldProductsPage.path,
       _ => OrdersPage.path,
     };
   }
@@ -119,7 +128,7 @@ class _AdminShellState extends State<AdminShell> {
       final p when p.startsWith(OrdersPage.path) => 0,
       final p when p.startsWith(CategoriesPage.path) => 1,
       final p when p.startsWith(ProductsPage.path) => 2,
-      final p when p.startsWith(CitiesPage.path) => 3,
+      final p when p.startsWith(SoldProductsPage.path) => 3,
       _ => 0,
     };
   }

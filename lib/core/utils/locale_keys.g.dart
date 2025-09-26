@@ -151,5 +151,19 @@ abstract class  LocaleKeys {
   static const select_new_status = 'select_new_status';
   static const order_status_updated = 'order_status_updated';
   static const close = 'close';
+  static const error_select_files = 'error_select_files';
+  static const please_enter_valid_number = 'please_enter_valid_number';
+  static const please_select_image = 'please_select_image';
+  static const add_images = 'add_images';
+  static const existing_images = 'existing_images';
+  static const new_images_to_upload = 'new_images_to_upload';
+  static const selected_images = 'selected_images';
+  static const error_selecting_files = 'error_selecting_files';
+  static const file_size_kb = 'file_size_kb';
+  static const delete_product = 'delete_product';
+  static const are_you_sure_delete_product = 'are_you_sure_delete_product';
+  static const product_name = 'product_name';
+  static const sold_amount = 'sold_amount';
+  static const menu_sold_products = 'menu_sold_products';
 
 }
