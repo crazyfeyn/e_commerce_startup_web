@@ -95,7 +95,7 @@ class _AdminShellState extends State<AdminShell> {
                 icon: Icon(Icons.inventory),
               ),
               SideMenuItem(
-                title: context.tr(LocaleKeys.menu_cities),
+                title: context.tr(LocaleKeys.menu_sold_products),
                 onTap: onChanged,
                 icon: Icon(Icons.location_city),
               ),
