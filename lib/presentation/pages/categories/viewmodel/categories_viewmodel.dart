@@ -107,7 +107,6 @@ class CategoriesViewmodel extends ChangeNotifier {
         );
 
         if (success) {
-          // Step 2: Upload new image if provided
           if (iconFile != null && iconFileName != null) {
             final uploadResult = await _repository.uploadIcon(
               categoryId: categoryId,
@@ -116,7 +115,6 @@ class CategoriesViewmodel extends ChangeNotifier {
             );
 
             if (uploadResult.isLeft()) {
-              // Image upload failed, but category data was updated
               formzStatus = FormzSubmissionStatus.success;
               notifyListeners();
               await fetchCategories();
@@ -124,7 +122,6 @@ class CategoriesViewmodel extends ChangeNotifier {
             }
           }
 
-          // Step 3: Refresh categories list
           await fetchCategories();
           return;
         }

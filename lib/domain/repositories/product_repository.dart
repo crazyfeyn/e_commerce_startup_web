@@ -8,13 +8,16 @@ abstract class ProductRepository {
 
   Future<Either<String, List<MeasurementModel>>> fetchMeasurements();
 
-  Future<Either<String, bool>> createProduct(ProductModel product);
+  Future<Either<String, int>> createProduct(ProductModel product);
 
   Future<Either<String, bool>> editProduct(ProductModel product);
 
   Future<Either<String, bool>> deleteProduct(int productId);
 
-  Future<Either<String, bool>> uploadImage(int productId, List<UploadImageModel> files);
+  Future<Either<String, bool>> uploadImage(
+    int productId,
+    List<UploadImageModel> files,
+  );
 
   void dispose();
 }

@@ -22,10 +22,12 @@ class ProductRepositoryImpl extends ProductRepository {
       final api = NetworkService.apiFetchProducts;
       final cancelToken = cancelTokenManager.getToken(api);
       final response = await NetworkService.get(api, cancelToken);
-      final result = response["data"]["list"].map<ProductModel>((e) => ProductModel.fromMap(e)).toList();
+      final result = response["data"]["list"]
+          .map<ProductModel>((e) => ProductModel.fromMap(e))
+          .toList();
       return Right(result);
-    } on NetworkException catch(e) {
-      if(e.type != NetworkExceptionType.cancelled) {
+    } on NetworkException catch (e) {
+      if (e.type != NetworkExceptionType.cancelled) {
         GlobalSnackBar.showError(e.message);
       }
       return Left(e.toString());
@@ -40,10 +42,12 @@ class ProductRepositoryImpl extends ProductRepository {
       final api = NetworkService.apiFetchMeasurement;
       final cancelToken = cancelTokenManager.getToken(api);
       final response = await NetworkService.get(api, cancelToken);
-      final result = response["data"]["list"].map<MeasurementModel>((e) => MeasurementModel.fromMap(e)).toList();
+      final result = response["data"]["list"]
+          .map<MeasurementModel>((e) => MeasurementModel.fromMap(e))
+          .toList();
       return Right(result);
-    } on NetworkException catch(e) {
-      if(e.type != NetworkExceptionType.cancelled) {
+    } on NetworkException catch (e) {
+      if (e.type != NetworkExceptionType.cancelled) {
         GlobalSnackBar.showError(e.message);
       }
       return Left(e.toString());
@@ -53,15 +57,24 @@ class ProductRepositoryImpl extends ProductRepository {
   }
 
   @override
-  Future<Either<String, bool>> createProduct(ProductModel product) async {
+  Future<Either<String, int>> createProduct(ProductModel product) async {
     try {
       final api = NetworkService.apiCreateProduct;
       final cancelToken = cancelTokenManager.getToken(api);
-      final response = await NetworkService.post(api, cancelToken, product.toCreate());
-      final result = response["success"];
-      return Right(result);
-    } on NetworkException catch(e) {
-      if(e.type != NetworkExceptionType.cancelled) {
+      final response = await NetworkService.post(
+        api,
+        cancelToken,
+        product.toCreate(),
+      );
+      final success = response["success"];
+      if (success) {
+        final productId = response["data"]?["id"];
+        return Right(productId);
+      } else {
+        return Left("Failed to create product");
+      }
+    } on NetworkException catch (e) {
+      if (e.type != NetworkExceptionType.cancelled) {
         GlobalSnackBar.showError(e.message);
       }
       return Left(e.toString());
@@ -75,11 +88,16 @@ class ProductRepositoryImpl extends ProductRepository {
     try {
       final api = NetworkService.apiEditProduct;
       final cancelToken = cancelTokenManager.getToken(api);
-      final response = await NetworkService.put(api, cancelToken, product.toEdit(), NetworkService.paramsEditProduct(product.id!));
+      final response = await NetworkService.put(
+        api,
+        cancelToken,
+        product.toEdit(),
+        NetworkService.paramsEditProduct(product.id!),
+      );
       final result = response["success"];
       return Right(result);
-    } on NetworkException catch(e) {
-      if(e.type != NetworkExceptionType.cancelled) {
+    } on NetworkException catch (e) {
+      if (e.type != NetworkExceptionType.cancelled) {
         GlobalSnackBar.showError(e.message);
       }
       return Left(e.toString());
@@ -93,11 +111,24 @@ class ProductRepositoryImpl extends ProductRepository {
     try {
       final api = NetworkService.apiDeleteProduct;
       final cancelToken = cancelTokenManager.getToken(api);
-      final response = await NetworkService.delete(api, cancelToken, NetworkService.paramsEditProduct(productId));
-      final result = response["success"];
-      return Right(result);
-    } on NetworkException catch(e) {
-      if(e.type != NetworkExceptionType.cancelled) {
+      final response = await NetworkService.delete(
+        api,
+        cancelToken,
+        NetworkService.paramsEditProduct(productId),
+      );
+
+      final success = response["success"] as bool?;
+      if (success == true) {
+        return Right(true);
+      } else {
+        // Extract error message from response
+        final errorMessage =
+            response["error"]?["message"] ?? "Failed to delete product";
+        GlobalSnackBar.showError(errorMessage);
+        return Left(errorMessage);
+      }
+    } on NetworkException catch (e) {
+      if (e.type != NetworkExceptionType.cancelled) {
         GlobalSnackBar.showError(e.message);
       }
       return Left(e.toString());
@@ -110,7 +141,10 @@ class ProductRepositoryImpl extends ProductRepository {
   void dispose() => cancelTokenManager.cancelAll();
 
   @override
-  Future<Either<String, bool>> uploadImage(int productId, List<UploadImageModel> files) async {
+  Future<Either<String, bool>> uploadImage(
+    int productId,
+    List<UploadImageModel> files,
+  ) async {
     try {
       final api = NetworkService.apiUploadImageProduct;
       final cancelToken = cancelTokenManager.getToken(api);
@@ -148,5 +182,4 @@ class ProductRepositoryImpl extends ProductRepository {
       return Left(e.toString());
     }
   }
-
 }

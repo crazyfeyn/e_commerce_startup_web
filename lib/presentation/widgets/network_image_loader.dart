@@ -137,7 +137,9 @@ class _NetworkImageLoaderState extends State<NetworkImageLoader> {
   @override
   Widget build(BuildContext context) {
     if (_isLoading) {
-      return const Center(child: CircularProgressIndicator());
+      return const Center(
+        child: CircularProgressIndicator(padding: EdgeInsets.all(10)),
+      );
     }
     if (_hasError || _imageBytes == null) {
       return const Icon(Icons.error, size: 50, color: Colors.red);

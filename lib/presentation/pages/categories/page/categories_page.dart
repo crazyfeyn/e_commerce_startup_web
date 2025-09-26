@@ -168,8 +168,8 @@ class CategoriesPage extends StatelessWidget {
                       ),
                 );
               },
-              child: const Icon(Icons.add, size: 32),
               tooltip: context.tr(LocaleKeys.add_new_category),
+              child: const Icon(Icons.add, size: 32),
             ),
           );
         },

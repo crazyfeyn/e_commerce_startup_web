@@ -16,75 +16,110 @@ class ProductsViewmodel extends ChangeNotifier {
 
   Future<void> fetchProducts() async {
     final result = await _repository.fetchProducts();
-    if(result.isRight()) {
+    if (result.isRight()) {
       products = result.getOrElse(() => throw Exception("Unexpected error"));
       formzStatus = FormzSubmissionStatus.success;
       notifyListeners();
-
     } else {
       formzStatus = FormzSubmissionStatus.failure;
       notifyListeners();
     }
   }
 
-  Future<void> createProduct(ProductModel product) async {
+  Future<void> createProduct(
+    ProductModel product,
+    List<UploadImageModel> images,
+  ) async {
     formzStatus = FormzSubmissionStatus.inProgress;
     notifyListeners();
 
-    final result = await _repository.createProduct(product);
-    if(result.isRight()) {
-      final res = result.getOrElse(() => throw Exception("Unexpected error"));
+    final createResult = await _repository.createProduct(product);
+    if (createResult.isRight()) {
+      final productId = createResult.getOrElse(
+        () => throw Exception("Unexpected error"),
+      );
 
-      if(res) return await fetchProducts();
-      formzStatus = FormzSubmissionStatus.canceled;
+      if (images.isNotEmpty) {
+        final uploadResult = await _repository.uploadImage(productId, images);
+        if (uploadResult.isLeft()) {
+          formzStatus = FormzSubmissionStatus.failure;
+          notifyListeners();
+          await fetchProducts();
+          return;
+        }
+      }
+      formzStatus = FormzSubmissionStatus.success;
       notifyListeners();
+      await fetchProducts();
     } else {
       formzStatus = FormzSubmissionStatus.failure;
       notifyListeners();
     }
   }
 
-  Future<void> editProduct(List<UploadImageModel> files, ProductModel product) async {
-    if(product.id == null) return;
+  Future<void> editProduct(
+    List<UploadImageModel> files,
+    ProductModel product,
+  ) async {
+    if (product.id == null) return;
 
     formzStatus = FormzSubmissionStatus.inProgress;
     notifyListeners();
+    if (files.isNotEmpty) {
+      final uploadResult = await uploadImages(product.id!, files);
+      if (!uploadResult) {
+        formzStatus = FormzSubmissionStatus.failure;
+        notifyListeners();
+        return;
+      }
+    }
 
-    if(files.isNotEmpty) await uploadImages(product.id!, files);
     final result = await _repository.editProduct(product);
-    if(result.isRight()) {
+    if (result.isRight()) {
       final res = result.getOrElse(() => throw Exception("Unexpected error"));
 
-      if(res) return await fetchProducts();
-      formzStatus = FormzSubmissionStatus.canceled;
-      notifyListeners();
+      if (res) {
+        formzStatus = FormzSubmissionStatus.success;
+        notifyListeners();
+        await fetchProducts();
+      } else {
+        formzStatus = FormzSubmissionStatus.canceled;
+        notifyListeners();
+      }
     } else {
       formzStatus = FormzSubmissionStatus.failure;
       notifyListeners();
     }
   }
 
-  Future<void> uploadImages(int productId, List<UploadImageModel> files) async {
+  Future<bool> uploadImages(int productId, List<UploadImageModel> files) async {
     final result = await _repository.uploadImage(productId, files);
-    if(result.isRight()) {
+    if (result.isRight()) {
       final res = result.getOrElse(() => throw Exception("Unexpected error"));
-      debugPrint("RESPONCE: $res");
+      debugPrint("RESPONSE: $res");
+      return true;
     }
+    return false;
   }
 
   Future<void> deleteProduct(int? productid) async {
-    if(productid == null) return;
+    if (productid == null) return;
 
     formzStatus = FormzSubmissionStatus.inProgress;
     notifyListeners();
 
     final result = await _repository.deleteProduct(productid);
-    if(result.isRight()) {
+    if (result.isRight()) {
       final res = result.getOrElse(() => throw Exception("Unexpected error"));
 
-      if(res) return await fetchProducts();
-      formzStatus = FormzSubmissionStatus.canceled;
-      notifyListeners();
+      if (res) {
+        formzStatus = FormzSubmissionStatus.success;
+        notifyListeners();
+        await fetchProducts();
+      } else {
+        formzStatus = FormzSubmissionStatus.canceled;
+        notifyListeners();
+      }
     } else {
       formzStatus = FormzSubmissionStatus.failure;
       notifyListeners();
