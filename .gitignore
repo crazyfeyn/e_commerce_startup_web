@@ -30,7 +30,7 @@ migrate_working_dir/
 .pub/
 
 # Ignore everything in build folder
-/build/*
+build/*
 # Except the web_release folder
 !/build/web_release/
 
