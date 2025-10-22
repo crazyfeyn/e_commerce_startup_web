@@ -1,186 +1,240 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>App Screenshots</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+<div class="container">
+        <!-- Header -->
+        <header style="text-align: center; margin-bottom: 40px;">
+            <h1 style="color: white; font-size: 3em; margin-bottom: 10px; text-shadow: 2px 2px 4px rgba(0,0,0,0.3);">App Screenshots</h1>
+            <p style="color: rgba(255,255,255,0.9); font-size: 1.2em;">Product Purchase Flow & Payment Integration</p>
+        </header>
 
-        body {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            padding: 40px 20px;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-        }
-
-        .container {
-            max-width: 1400px;
-            margin: 0 auto;
-        }
-
-        .gallery {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 30px;
-            padding: 20px;
-        }
-
-        .image-card {
-            background: white;
-            border-radius: 20px;
-            overflow: hidden;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-            cursor: pointer;
-        }
-
-        .image-card:hover {
-            transform: translateY(-10px);
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-        }
-
-        .image-card img {
-            width: 100%;
-            height: auto;
-            display: block;
-            object-fit: cover;
-        }
-
-        /* Modal styles */
-        .modal {
-            display: none;
-            position: fixed;
-            z-index: 1000;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.95);
-            justify-content: center;
-            align-items: center;
-        }
-
-        .modal.active {
-            display: flex;
-        }
-
-        .modal-content {
-            max-width: 90%;
-            max-height: 90%;
-            object-fit: contain;
-            border-radius: 10px;
-            animation: zoomIn 0.3s ease;
-        }
-
-        @keyframes zoomIn {
-            from {
-                transform: scale(0.5);
-                opacity: 0;
-            }
-            to {
-                transform: scale(1);
-                opacity: 1;
-            }
-        }
-
-        .close {
-            position: absolute;
-            top: 30px;
-            right: 50px;
-            color: white;
-            font-size: 50px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: color 0.3s ease;
-        }
-
-        .close:hover {
-            color: #667eea;
-        }
-
-        @media (max-width: 768px) {
-            .gallery {
-                grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-                gap: 20px;
-            }
-
-            .close {
-                top: 20px;
-                right: 30px;
-                font-size: 40px;
-            }
-        }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <div class="gallery">
-            <div class="image-card" onclick="openModal('login.png')">
-                <img src="login.png" alt="Login Screen">
+        <!-- Product Purchase Flow Section -->
+        <section style="background: white; border-radius: 20px; padding: 40px; margin-bottom: 40px; box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);">
+            <h2 style="color: #667eea; margin-bottom: 30px; font-size: 2em; border-bottom: 3px solid #667eea; padding-bottom: 10px;">🛍️ Product Purchase Flow</h2>
+            <p style="color: #666; margin-bottom: 30px; font-size: 1.1em; line-height: 1.6;">
+                Select product → Add to cart → Checkout → Pay with Toss Payments
+            </p>
+            
+            <div class="gallery">
+                <div class="image-card" onclick="openModal('home.png')">
+                    <img src="home.png" alt="Home Screen - Product List">
+                    <div style="padding: 15px; text-align: center; background: #f8f9fa;">
+                        <strong>Step 1: Browse Products</strong>
+                    </div>
+                </div>
+                <div class="image-card" onclick="openModal('detail.png')">
+                    <img src="detail.png" alt="Product Detail">
+                    <div style="padding: 15px; text-align: center; background: #f8f9fa;">
+                        <strong>Step 2: View Details</strong>
+                    </div>
+                </div>
+                <div class="image-card" onclick="openModal('added_cart.png')">
+                    <img src="added_cart.png" alt="Added to Cart">
+                    <div style="padding: 15px; text-align: center; background: #f8f9fa;">
+                        <strong>Step 3: Add to Cart</strong>
+                    </div>
+                </div>
+                <div class="image-card" onclick="openModal('cart.png')">
+                    <img src="cart.png" alt="Cart">
+                    <div style="padding: 15px; text-align: center; background: #f8f9fa;">
+                        <strong>Step 4: Review Cart</strong>
+                    </div>
+                </div>
+                <div class="image-card" onclick="openModal('proceed_checkout.png')">
+                    <img src="proceed_checkout.png" alt="Proceed to Checkout">
+                    <div style="padding: 15px; text-align: center; background: #f8f9fa;">
+                        <strong>Step 5: Checkout</strong>
+                    </div>
+                </div>
             </div>
-            <div class="image-card" onclick="openModal('language.png')">
-                <img src="language.png" alt="Language Selection">
+        </section>
+
+        <!-- Payment Flow Section -->
+        <section style="background: white; border-radius: 20px; padding: 40px; margin-bottom: 40px; box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);">
+            <h2 style="color: #667eea; margin-bottom: 30px; font-size: 2em; border-bottom: 3px solid #667eea; padding-bottom: 10px;">💳 Payment Flow Confirmation</h2>
+            <p style="color: #666; margin-bottom: 30px; font-size: 1.1em; line-height: 1.6;">
+                Secure payment processing through Toss Payments integration
+            </p>
+            
+            <div class="gallery">
+                <div class="image-card" onclick="openModal('payment.png')">
+                    <img src="payment.png" alt="Payment Screen">
+                    <div style="padding: 15px; text-align: center; background: #f8f9fa;">
+                        <strong>Payment Method Selection</strong>
+                    </div>
+                </div>
+                <div class="image-card" onclick="openModal('payment_2.png')">
+                    <img src="payment_2.png" alt="Payment Confirmation">
+                    <div style="padding: 15px; text-align: center; background: #f8f9fa;">
+                        <strong>Payment Processing</strong>
+                    </div>
+                </div>
+                <div class="image-card" onclick="openModal('order_success.png')">
+                    <img src="order_success.png" alt="Order Success">
+                    <div style="padding: 15px; text-align: center; background: #f8f9fa;">
+                        <strong>Order Success</strong>
+                    </div>
+                </div>
             </div>
-            <div class="image-card" onclick="openModal('home.png')">
-                <img src="home.png" alt="Home Screen">
+        </section>
+
+        <!-- Order Management Section -->
+        <section style="background: white; border-radius: 20px; padding: 40px; margin-bottom: 40px; box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);">
+            <h2 style="color: #667eea; margin-bottom: 30px; font-size: 2em; border-bottom: 3px solid #667eea; padding-bottom: 10px;">📦 Order Management</h2>
+            
+            <div class="gallery">
+                <div class="image-card" onclick="openModal('history.png')">
+                    <img src="history.png" alt="Order History">
+                    <div style="padding: 15px; text-align: center; background: #f8f9fa;">
+                        <strong>Order History</strong>
+                    </div>
+                </div>
+                <div class="image-card" onclick="openModal('history_detail.png')">
+                    <img src="history_detail.png" alt="Order Details">
+                    <div style="padding: 15px; text-align: center; background: #f8f9fa;">
+                        <strong>Order Details</strong>
+                    </div>
+                </div>
+                <div class="image-card" onclick="openModal('delivery.png')">
+                    <img src="delivery.png" alt="Delivery Status">
+                    <div style="padding: 15px; text-align: center; background: #f8f9fa;">
+                        <strong>Delivery Tracking</strong>
+                    </div>
+                </div>
             </div>
-            <div class="image-card" onclick="openModal('detail.png')">
-                <img src="detail.png" alt="Product Detail">
+        </section>
+
+        <!-- Delivery Policy Section -->
+        <section style="background: white; border-radius: 20px; padding: 40px; margin-bottom: 40px; box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);">
+            <h2 style="color: #667eea; margin-bottom: 30px; font-size: 2em; border-bottom: 3px solid #667eea; padding-bottom: 10px;">🚚 Delivery Policy</h2>
+            
+            <div style="background: #f8f9fa; padding: 30px; border-radius: 15px; margin-bottom: 20px;">
+                <h3 style="color: #333; margin-bottom: 15px; font-size: 1.3em;">Delivery Timeline</h3>
+                <p style="color: #666; font-size: 1.1em; line-height: 1.8;">
+                    Standard delivery takes <strong>1-4 business days</strong> from the date of order confirmation. Delivery times may vary depending on your location and product availability.
+                </p>
             </div>
-            <div class="image-card" onclick="openModal('added_cart.png')">
-                <img src="added_cart.png" alt="Added to Cart">
+
+            <div style="background: #f8f9fa; padding: 30px; border-radius: 15px;">
+                <h3 style="color: #333; margin-bottom: 15px; font-size: 1.3em;">Delivery Information</h3>
+                <ul style="color: #666; font-size: 1.1em; line-height: 2; list-style-position: inside;">
+                    <li>Orders are processed within 24 hours of payment confirmation</li>
+                    <li>Tracking information will be provided via SMS and email</li>
+                    <li>Delivery is available nationwide</li>
+                    <li>Free delivery on orders over a certain amount (varies by promotion)</li>
+                </ul>
             </div>
-            <div class="image-card" onclick="openModal('cart.png')">
-                <img src="cart.png" alt="Cart">
+        </section>
+
+        <!-- Refund Policy Section -->
+        <section style="background: white; border-radius: 20px; padding: 40px; margin-bottom: 40px; box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);">
+            <h2 style="color: #667eea; margin-bottom: 30px; font-size: 2em; border-bottom: 3px solid #667eea; padding-bottom: 10px;">🔁 Refund Policy</h2>
+            
+            <div style="background: #f0f4ff; padding: 25px; border-radius: 15px; margin-bottom: 20px; border-left: 5px solid #667eea;">
+                <h3 style="color: #333; margin-bottom: 15px; font-size: 1.3em;">📅 Refund Period</h3>
+                <p style="color: #666; font-size: 1.1em; line-height: 1.8;">
+                    Customers may request a refund within <strong>7 days</strong> of receiving the product.
+                </p>
             </div>
-            <div class="image-card" onclick="openModal('proceed_checkout.png')">
-                <img src="proceed_checkout.png" alt="Proceed to Checkout">
+
+            <div style="background: #f0f4ff; padding: 25px; border-radius: 15px; margin-bottom: 20px; border-left: 5px solid #667eea;">
+                <h3 style="color: #333; margin-bottom: 15px; font-size: 1.3em;">📞 Initiate Refund</h3>
+                <p style="color: #666; font-size: 1.1em; line-height: 1.8;">
+                    To initiate a refund, please contact our call center within the refund period at <strong style="color: #667eea;">+82-010-6343-1995</strong> or <strong style="color: #667eea;">+82-010-6343-1995</strong>
+                </p>
             </div>
-            <div class="image-card" onclick="openModal('delivery.png')">
-                <img src="delivery.png" alt="Delivery">
+
+            <div style="background: #fff3cd; padding: 25px; border-radius: 15px; margin-bottom: 20px; border-left: 5px solid #ffc107;">
+                <h3 style="color: #333; margin-bottom: 15px; font-size: 1.3em;">⚠️ Late Requests</h3>
+                <p style="color: #666; font-size: 1.1em; line-height: 1.8;">
+                    Refund requests made after 7 days from the date of receipt cannot be accepted.
+                </p>
             </div>
-            <div class="image-card" onclick="openModal('history.png')">
-                <img src="history.png" alt="Order History">
+
+            <div style="background: #f0f4ff; padding: 25px; border-radius: 15px; margin-bottom: 20px; border-left: 5px solid #667eea;">
+                <h3 style="color: #333; margin-bottom: 15px; font-size: 1.3em;">📦 Product Condition</h3>
+                <p style="color: #666; font-size: 1.1em; line-height: 1.8;">
+                    Refunds are available only for products that are <strong>unused and in their original condition and packaging</strong>.
+                </p>
             </div>
-            <div class="image-card" onclick="openModal('history_detail.png')">
-                <img src="history_detail.png" alt="History Detail">
+
+            <div style="background: #ffe6e6; padding: 25px; border-radius: 15px; margin-bottom: 20px; border-left: 5px solid #dc3545;">
+                <h3 style="color: #333; margin-bottom: 15px; font-size: 1.3em;">❌ Damaged Products</h3>
+                <p style="color: #666; font-size: 1.1em; line-height: 1.8;">
+                    If the product has been opened or damaged due to customer negligence, refunds will not be processed.
+                </p>
             </div>
-            <div class="image-card" onclick="openModal('profile.png')">
-                <img src="profile.png" alt="Profile">
+
+            <div style="background: #e8f5e9; padding: 25px; border-radius: 15px; border-left: 5px solid #28a745;">
+                <h3 style="color: #333; margin-bottom: 15px; font-size: 1.3em;">💰 Refund Processing</h3>
+                <p style="color: #666; font-size: 1.1em; line-height: 1.8;">
+                    Once the refund request is approved, the payment amount will be returned to the original payment method within <strong>3-5 business days</strong>.
+                </p>
             </div>
-        </div>
+
+            <div style="text-align: center; margin-top: 30px; padding: 25px; background: #f8f9fa; border-radius: 15px;">
+                <p style="color: #666; font-size: 1.1em; margin-bottom: 15px;">For refund inquiries, please contact:</p>
+                <p style="color: #667eea; font-size: 1.5em; font-weight: bold;">
+                    📞 +82-010-6343-1995<br>
+                    📱 +82-010-6343-1995
+                </p>
+            </div>
+        </section>
+
+        <!-- Additional Screenshots -->
+        <section style="background: white; border-radius: 20px; padding: 40px; margin-bottom: 40px; box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);">
+            <h2 style="color: #667eea; margin-bottom: 30px; font-size: 2em; border-bottom: 3px solid #667eea; padding-bottom: 10px;">📱 Additional App Features</h2>
+            
+            <div class="gallery">
+                <div class="image-card" onclick="openModal('login.png')">
+                    <img src="login.png" alt="Login Screen">
+                    <div style="padding: 15px; text-align: center; background: #f8f9fa;">
+                        <strong>Login Screen</strong>
+                    </div>
+                </div>
+                <div class="image-card" onclick="openModal('language.png')">
+                    <img src="language.png" alt="Language Selection">
+                    <div style="padding: 15px; text-align: center; background: #f8f9fa;">
+                        <strong>Language Selection</strong>
+                    </div>
+                </div>
+                <div class="image-card" onclick="openModal('profile.png')">
+                    <img src="profile.png" alt="User Profile">
+                    <div style="padding: 15px; text-align: center; background: #f8f9fa;">
+                        <strong>User Profile</strong>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Business Information Footer -->
+        <footer style="background: white; border-radius: 20px; padding: 40px; box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);">
+            <h2 style="color: #667eea; margin-bottom: 30px; font-size: 2em; border-bottom: 3px solid #667eea; padding-bottom: 10px;">🏢 Business Information</h2>
+            
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 25px;">
+                <div style="background: #f8f9fa; padding: 20px; border-radius: 10px;">
+                    <h3 style="color: #667eea; margin-bottom: 10px; font-size: 1.2em;">Company Contact</h3>
+                    <p style="color: #666; font-size: 1.1em; line-height: 1.8;">
+                        📞 +82-010-6343-1995<br>
+                        📱 +82-010-6343-1995
+                    </p>
+                </div>
+                
+                <div style="background: #f8f9fa; padding: 20px; border-radius: 10px;">
+                    <h3 style="color: #667eea; margin-bottom: 10px; font-size: 1.2em;">Customer Service</h3>
+                    <p style="color: #666; font-size: 1.1em; line-height: 1.8;">
+                        Operating Hours:<br>
+                        Monday - Friday: 9:00 AM - 6:00 PM KST<br>
+                        Closed on weekends and holidays
+                    </p>
+                </div>
+            </div>
+            
+            <div style="text-align: center; margin-top: 30px; padding-top: 30px; border-top: 2px solid #e9ecef;">
+                <p style="color: #999; font-size: 0.95em;">
+                    © 2025 All Rights Reserved | Powered by Toss Payments
+                </p>
+            </div>
+        </footer>
     </div>
-
-    <!-- Modal -->
-    <div id="modal" class="modal" onclick="closeModal()">
-        <span class="close">&times;</span>
-        <img class="modal-content" id="modalImage">
-    </div>
-
-    <script>
-        function openModal(imageSrc) {
-            const modal = document.getElementById('modal');
-            const modalImage = document.getElementById('modalImage');
-            modal.classList.add('active');
-            modalImage.src = imageSrc;
-        }
-
-        function closeModal() {
-            const modal = document.getElementById('modal');
-            modal.classList.remove('active');
-        }
-
-        // Close modal on Escape key
-        document.addEventListener('keydown', function(event) {
-            if (event.key === 'Escape') {
-                closeModal();
-            }
-        });
-    </script>
 </body>
 </html>
