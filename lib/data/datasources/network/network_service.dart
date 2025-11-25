@@ -174,6 +174,7 @@ class NetworkService {
   static String apiFileDownload(String identity) =>
       "/api/v1/file/download?identity=$identity";
   static final String apiFetchOrders = "/api/v1/admin/order/get-all";
+  static final String apiConfirmOrder = "/api/v1/order/confirm";
 
   /* Http Params */
   static Map<String, dynamic> paramsLogin(String phone, String password) {

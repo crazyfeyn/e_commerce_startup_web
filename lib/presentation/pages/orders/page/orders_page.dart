@@ -1,10 +1,11 @@
 import 'package:e_commerce_startup_web/core/utils/app_colors.dart';
 import 'package:e_commerce_startup_web/core/utils/app_enums.dart';
+import 'package:e_commerce_startup_web/core/utils/app_snackbar.dart';
 import 'package:e_commerce_startup_web/core/utils/locale_keys.g.dart';
+import 'package:e_commerce_startup_web/data/models/order_model.dart';
 import 'package:e_commerce_startup_web/presentation/pages/orders/viewmodel/orders_viewmodel.dart';
 import 'package:e_commerce_startup_web/presentation/pages/orders/widgets/order_detail_dialog.dart';
 import 'package:e_commerce_startup_web/presentation/pages/orders/widgets/order_helpers.dart';
-import 'package:e_commerce_startup_web/presentation/pages/orders/widgets/sample.dart';
 import 'package:e_commerce_startup_web/presentation/pages/orders/widgets/update_status_dialod.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/cupertino.dart';
@@ -15,6 +16,44 @@ class OrdersPage extends StatelessWidget {
   static const String path = "/orders";
 
   const OrdersPage({super.key});
+
+  Future<void> _handleConfirmOrder(
+    BuildContext context,
+    OrdersViewmodel viewmodel,
+    OrderModel order,
+  ) async {
+    final shouldConfirm =
+        await showDialog<bool>(
+          context: context,
+          builder: (dialogContext) => AlertDialog(
+            title: Text(dialogContext.tr(LocaleKeys.confirm_order)),
+            content: Text(
+              dialogContext.tr(
+                LocaleKeys.confirm_order_message,
+                args: ['${order.orderId}'],
+              ),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(dialogContext).pop(false),
+                child: Text(dialogContext.tr(LocaleKeys.cancel)),
+              ),
+              ElevatedButton(
+                onPressed: () => Navigator.of(dialogContext).pop(true),
+                child: Text(dialogContext.tr(LocaleKeys.confirm)),
+              ),
+            ],
+          ),
+        ) ??
+        false;
+
+    if (!shouldConfirm) return;
+
+    final success = await viewmodel.confirmOrder(order.orderId);
+    if (success) {
+      GlobalSnackBar.showSuccess(context.tr(LocaleKeys.confirm_order_success));
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -126,7 +165,7 @@ class OrdersPage extends StatelessWidget {
                             ),
                             DataColumn(
                               label: SizedBox(
-                                width: 80,
+                                width: 120,
                                 child: Text(
                                   context.tr(LocaleKeys.actions),
                                   overflow: TextOverflow.ellipsis,
@@ -136,6 +175,10 @@ class OrdersPage extends StatelessWidget {
                           ],
                           rows: List.generate(viewmodel.orders.length, (index) {
                             final order = viewmodel.orders[index];
+                            final bool canConfirmOrder =
+                                order.orderStatus.toLowerCase() == 'pending';
+                            final bool isConfirming = viewmodel
+                                .isOrderConfirming(order.orderId);
                             return DataRow(
                               cells: [
                                 DataCell(
@@ -387,11 +430,49 @@ class OrdersPage extends StatelessWidget {
                                 ),
                                 DataCell(
                                   SizedBox(
-                                    width: 80,
+                                    width: 120,
                                     child: Row(
                                       mainAxisAlignment:
                                           MainAxisAlignment.center,
                                       children: [
+                                        if (canConfirmOrder) ...[
+                                          SizedBox(
+                                            width: 28,
+                                            height: 28,
+                                            child: IconButton(
+                                              padding: EdgeInsets.zero,
+                                              constraints:
+                                                  const BoxConstraints(),
+                                              onPressed: isConfirming
+                                                  ? null
+                                                  : () => _handleConfirmOrder(
+                                                      context,
+                                                      viewmodel,
+                                                      order,
+                                                    ),
+                                              icon: isConfirming
+                                                  ? const SizedBox(
+                                                      width: 16,
+                                                      height: 16,
+                                                      child:
+                                                          CircularProgressIndicator(
+                                                            strokeWidth: 2,
+                                                          ),
+                                                    )
+                                                  : Icon(
+                                                      CupertinoIcons
+                                                          .check_mark_circled,
+                                                      size: 16,
+                                                      color:
+                                                          Colors.green.shade600,
+                                                    ),
+                                              tooltip: context.tr(
+                                                LocaleKeys.confirm_order,
+                                              ),
+                                            ),
+                                          ),
+                                          const SizedBox(width: 4),
+                                        ],
                                         SizedBox(
                                           width: 28,
                                           height: 28,

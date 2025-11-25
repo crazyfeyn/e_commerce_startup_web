@@ -151,6 +151,12 @@ abstract class  LocaleKeys {
   static const select_new_status = 'select_new_status';
   static const order_status_updated = 'order_status_updated';
   static const close = 'close';
+  static const confirm = 'confirm';
+  static const confirm_order = 'confirm_order';
+  static const confirm_order_message = 'confirm_order_message';
+  static const confirm_order_success = 'confirm_order_success';
+  static const confirm_order_failed = 'confirm_order_failed';
+  static const status_done = 'status_done';
   static const error_select_files = 'error_select_files';
   static const please_enter_valid_number = 'please_enter_valid_number';
   static const please_select_image = 'please_select_image';
