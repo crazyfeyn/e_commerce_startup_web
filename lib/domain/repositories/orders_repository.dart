@@ -6,5 +6,6 @@ abstract class OrdersRepository {
     int page = 0,
     int size = 100,
   });
+  Future<Either<String, bool>> confirmOrder(int orderId);
   void dispose();
 }

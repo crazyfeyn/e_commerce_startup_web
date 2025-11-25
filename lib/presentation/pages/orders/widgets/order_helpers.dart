@@ -8,6 +8,8 @@ Color getStatusColor(String status) {
       return Colors.orange.shade50;
     case 'confirmed':
       return Colors.blue.shade50;
+    case 'done':
+      return Colors.green.shade50;
     case 'processing':
       return Colors.purple.shade50;
     case 'shipped':
@@ -27,6 +29,8 @@ Color getStatusTextColor(String status) {
       return Colors.orange.shade700;
     case 'confirmed':
       return Colors.blue.shade700;
+    case 'done':
+      return Colors.green.shade700;
     case 'processing':
       return Colors.purple.shade700;
     case 'shipped':
@@ -47,6 +51,8 @@ String getStatusText(BuildContext context, String status) {
       return context.tr(LocaleKeys.status_pending);
     case 'confirmed':
       return context.tr(LocaleKeys.status_confirmed);
+    case 'done':
+      return context.tr(LocaleKeys.status_done);
     case 'processing':
       return context.tr(LocaleKeys.status_processing);
     case 'shipped':

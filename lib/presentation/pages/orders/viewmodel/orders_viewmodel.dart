@@ -7,22 +7,47 @@ class OrdersViewmodel extends ChangeNotifier {
   final _repository = OrdersRepositoryImpl();
 
   OrdersViewmodel() {
-    fetchCategories();
+    fetchOrders();
   }
 
   FormzSubmissionStatus formzStatus = FormzSubmissionStatus.inProgress;
   List<OrderModel> orders = [];
+  final Set<int> _confirmingOrders = {};
 
-  Future<void> fetchCategories() async {
-    final result = await _repository.fetchOrders();
-    if (result.isRight()) {
-      orders = result.getOrElse(() => throw Exception("Unexpected error"));
-      formzStatus = FormzSubmissionStatus.success;
-      notifyListeners();
-    } else {
-      formzStatus = FormzSubmissionStatus.failure;
+  bool isOrderConfirming(int orderId) => _confirmingOrders.contains(orderId);
+
+  Future<void> fetchOrders({bool showLoader = true}) async {
+    if (showLoader) {
+      formzStatus = FormzSubmissionStatus.inProgress;
       notifyListeners();
     }
+    final result = await _repository.fetchOrders();
+    result.fold(
+      (_) => formzStatus = FormzSubmissionStatus.failure,
+      (data) {
+        orders = data;
+        formzStatus = FormzSubmissionStatus.success;
+      },
+    );
+    notifyListeners();
+  }
+
+  Future<bool> confirmOrder(int orderId) async {
+    if (_confirmingOrders.contains(orderId)) return false;
+    _confirmingOrders.add(orderId);
+    notifyListeners();
+
+    final result = await _repository.confirmOrder(orderId);
+    final isSuccess = result.getOrElse(() => false);
+
+    if (isSuccess) {
+      await fetchOrders(showLoader: false);
+    }
+
+    _confirmingOrders.remove(orderId);
+    notifyListeners();
+
+    return isSuccess;
   }
 
   @override
