@@ -134,10 +134,8 @@ class OrdersPage extends StatelessWidget {
                               ),
                             ),
                           ],
-                          rows: List.generate(Sample.sampleOrders.length, (
-                            index,
-                          ) {
-                            final order = Sample.sampleOrders[index];
+                          rows: List.generate(viewmodel.orders.length, (index) {
+                            final order = viewmodel.orders[index];
                             return DataRow(
                               cells: [
                                 DataCell(
