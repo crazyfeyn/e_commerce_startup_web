@@ -121,8 +121,7 @@ class DBService {
   }
 
   String getClientId() {
-    return "2927cba1-6b30-4a26-9088-ee338333cf69";
-    // return _instance.getString(_StorageKeys.clientId) ?? '';
+    return _instance.getString(_StorageKeys.clientId) ?? '';
   }
 
   Future<bool> delClientId() async {

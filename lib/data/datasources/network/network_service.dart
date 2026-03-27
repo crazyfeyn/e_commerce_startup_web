@@ -18,22 +18,24 @@ class NetworkService {
     return _serverProd;
   }
 
-  static Map<String, String?> get getHeaders {
-    final langCode = LangService.currentLocale;
-    final accessToken = DBService.ensure.getAccessToken();
-    return {
-      "Authorization": "Bearer $accessToken",
-      "X-Request-UUID": Uuid().v4(),
-      "X-Client-Lang": langCode,
-      "X-Device-Type": "Web",
-    };
-  }
+  static Dio? _dioInstance;
 
   static Dio get _dio {
-    final dio = Dio(BaseOptions(baseUrl: getService, headers: getHeaders))
-      ..interceptors.add(LogInterceptor(requestBody: true, responseBody: true));
-
-    return dio..interceptors.add(NetworkInterceptor(dio));
+    if (_dioInstance != null) return _dioInstance!;
+    _dioInstance = Dio(
+      BaseOptions(
+        baseUrl: getService,
+        validateStatus: (status) {
+          // Allow all status codes to be handled by interceptor
+          return status != null && status < 500;
+        },
+      ),
+    );
+    _dioInstance!.interceptors.add(
+      LogInterceptor(requestBody: true, responseBody: true),
+    );
+    _dioInstance!.interceptors.add(NetworkInterceptor(_dioInstance!));
+    return _dioInstance!;
   }
 
   /* Http Requests */

@@ -6,11 +6,27 @@ import 'package:e_commerce_startup_web/data/datasources/database/db_service.dart
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 
+String _maskToken(String? token) {
+  if (token == null) return 'null';
+  if (token.isEmpty) return '';
+  final start = token.length >= 8 ? token.substring(0, 8) : token;
+  final end = token.length >= 8 ? token.substring(token.length - 8) : '';
+  return end.isEmpty ? '$start...' : '$start...$end';
+}
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   await EasyLocalization.ensureInitialized();
   await DBService.ensure.ensureInitialized();
+
+  // Debug: verify what SharedPreferences currently stores.
+  final accessToken = DBService.ensure.getAccessToken();
+  final refreshToken = DBService.ensure.getRefreshToken();
+  final clientId = DBService.ensure.getClientId();
+  debugPrint('[DBService] init: accessToken(${accessToken.length})=${_maskToken(accessToken)}');
+  debugPrint('[DBService] init: refreshToken(${refreshToken.length})=${_maskToken(refreshToken)}');
+  debugPrint('[DBService] init: clientId=${clientId.isEmpty ? "(empty)" : clientId}');
 
   runApp(
     EasyLocalization(
