@@ -1,15 +1,12 @@
 import 'dart:io';
 
-import 'package:e_commerce_startup_web/core/services/lang_service.dart';
 import 'package:e_commerce_startup_web/core/utils/locale_keys.g.dart';
-import 'package:e_commerce_startup_web/data/datasources/database/db_service.dart';
 import 'package:e_commerce_startup_web/data/datasources/network/network_helper.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:dio/dio.dart';
-import 'package:uuid/uuid.dart';
 
 class NetworkService {
-  static bool _isTester = true;
+  static final bool _isTester = true;
   static final _serverDev = "https://hilol-market.kr";
   static final _serverProd = "https://hilol-market.kr";
 
@@ -25,10 +22,8 @@ class NetworkService {
     _dioInstance = Dio(
       BaseOptions(
         baseUrl: getService,
-        validateStatus: (status) {
-          // Allow all status codes to be handled by interceptor
-          return status != null && status < 500;
-        },
+        // Remove validateStatus entirely, or set it properly:
+        validateStatus: (status) => status == 200,
       ),
     );
     _dioInstance!.interceptors.add(
@@ -154,6 +149,7 @@ class NetworkService {
   /* Http Apis */
   static final String apiLogin = "/api/v1/auth/login";
   static final String apiRefreshToken = "/api/v1/auth/refresh-token";
+  static final String apiAdminRegister = "/api/v1/admin/register";
 
   static final String apiFetchCategories =
       "/api/v1/admin/product-category/get-all";
@@ -181,6 +177,20 @@ class NetworkService {
   /* Http Params */
   static Map<String, dynamic> paramsLogin(String phone, String password) {
     return {"phoneNumber": phone, "password": password};
+  }
+
+  static Map<String, dynamic> paramsAdminRegister({
+    required String firstname,
+    required String lastname,
+    required String phoneNumber,
+    required String password,
+  }) {
+    return {
+      "firstname": firstname,
+      "lastname": lastname,
+      "phoneNumber": phoneNumber,
+      "password": password,
+    };
   }
 
   static Map<String, dynamic> paramsRefreshToken(

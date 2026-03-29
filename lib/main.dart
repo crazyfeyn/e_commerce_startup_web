@@ -24,9 +24,15 @@ void main() async {
   final accessToken = DBService.ensure.getAccessToken();
   final refreshToken = DBService.ensure.getRefreshToken();
   final clientId = DBService.ensure.getClientId();
-  debugPrint('[DBService] init: accessToken(${accessToken.length})=${_maskToken(accessToken)}');
-  debugPrint('[DBService] init: refreshToken(${refreshToken.length})=${_maskToken(refreshToken)}');
-  debugPrint('[DBService] init: clientId=${clientId.isEmpty ? "(empty)" : clientId}');
+  debugPrint(
+    '[DBService] init: accessToken(${accessToken.length})=${_maskToken(accessToken)}',
+  );
+  debugPrint(
+    '[DBService] init: refreshToken(${refreshToken.length})=${_maskToken(refreshToken)}',
+  );
+  debugPrint(
+    '[DBService] init: clientId=${clientId.isEmpty ? "(empty)" : clientId}',
+  );
 
   runApp(
     EasyLocalization(

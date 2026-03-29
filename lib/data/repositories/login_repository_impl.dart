@@ -65,6 +65,46 @@ class LoginRepositoryImpl extends LoginRepository {
   void dispose() => cancelTokenManager.cancelAll();
 
   @override
+  Future<Either<String, bool>> registerAdmin({
+    required String firstname,
+    required String lastname,
+    required String phoneNumber,
+    required String password,
+  }) async {
+    try {
+      final api = NetworkService.apiAdminRegister;
+      final cancelToken = cancelTokenManager.getToken(api);
+
+      final response = await NetworkService.post(
+        api,
+        cancelToken,
+        NetworkService.paramsAdminRegister(
+          firstname: firstname.trim(),
+          lastname: lastname.trim(),
+          phoneNumber: phoneNumber.trim(),
+          password: password,
+        ),
+      );
+
+      final result = response['success'] == true;
+      if (!result) {
+        final errMsg = response["error"]?["message"]?.toString();
+        if (errMsg != null && errMsg.isNotEmpty) {
+          GlobalSnackBar.showError(errMsg);
+        }
+      }
+      return Right(result);
+    } on NetworkException catch (e) {
+      if (e.type != NetworkExceptionType.cancelled) {
+        GlobalSnackBar.showError(e.message);
+      }
+      return Left(e.toString());
+    } catch (e) {
+      return Left(e.toString());
+    }
+  }
+
+  @override
   Future<Either<String, bool>> onRefreshToken(
     String clientId,
     String refreshToken,

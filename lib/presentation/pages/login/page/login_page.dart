@@ -25,7 +25,8 @@ class _LoginPageState extends State<LoginPage> {
   final _formKey = GlobalKey<FormState>();
   final _phoneController = TextEditingController();
   final _passwordController = TextEditingController();
-
+  final _firstnameController = TextEditingController();
+  final _lastnameController = TextEditingController();
 
   void onNavigation(bool value) {
     if(value == false) return;
@@ -47,11 +48,39 @@ class _LoginPageState extends State<LoginPage> {
                 child: Column(
                   children: [
                     Text(
-                      context.tr(LocaleKeys.login_to_admin),
+                      viewmodel.isRegisterMode
+                          ? "Register admin"
+                          : context.tr(LocaleKeys.login_to_admin),
                       style: AppStyles.titleXLSemibold,
                       textAlign: TextAlign.center,
                     ),
                     const SizedBox(height: 24),
+                    if (viewmodel.isRegisterMode) ...[
+                      CustomTextField(
+                        title: "First name",
+                        hintText: "Enter first name",
+                        ctr: _firstnameController,
+                        validator: (value) {
+                          if (value == null || value.trim().isEmpty) {
+                            return "First name is required";
+                          }
+                          return null;
+                        },
+                      ),
+                      const SizedBox(height: 12),
+                      CustomTextField(
+                        title: "Last name",
+                        hintText: "Enter last name",
+                        ctr: _lastnameController,
+                        validator: (value) {
+                          if (value == null || value.trim().isEmpty) {
+                            return "Last name is required";
+                          }
+                          return null;
+                        },
+                      ),
+                      const SizedBox(height: 12),
+                    ],
                     CustomPhoneField(
                       controller: _phoneController,
                       title: context.tr(LocaleKeys.phone_number),
@@ -80,10 +109,38 @@ class _LoginPageState extends State<LoginPage> {
                         if (_formKey.currentState!.validate()) {
                           final phone = _phoneController.text.trim();
                           final password = _passwordController.text.trim();
-                          viewmodel.login(phone, password).then(onNavigation);
+                          if (viewmodel.isRegisterMode) {
+                            final firstname = _firstnameController.text.trim();
+                            final lastname = _lastnameController.text.trim();
+                            viewmodel
+                                .registerAdmin(
+                                  firstname: firstname,
+                                  lastname: lastname,
+                                  phoneNumber: phone,
+                                  password: password,
+                                )
+                                .then((ok) {
+                                  if (ok) {
+                                    viewmodel.toggleMode();
+                                  }
+                                });
+                          } else {
+                            viewmodel.login(phone, password).then(onNavigation);
+                          }
                         }
                       },
-                      title: context.tr(LocaleKeys.login_btn),
+                      title: viewmodel.isRegisterMode
+                          ? "Register"
+                          : context.tr(LocaleKeys.login_btn),
+                    ),
+                    const SizedBox(height: 12),
+                    TextButton(
+                      onPressed: viewmodel.toggleMode,
+                      child: Text(
+                        viewmodel.isRegisterMode
+                            ? "Back to login"
+                            : "Register new admin",
+                      ),
                     ),
                   ],
                 ),

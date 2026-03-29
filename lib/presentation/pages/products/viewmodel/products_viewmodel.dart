@@ -33,28 +33,79 @@ class ProductsViewmodel extends ChangeNotifier {
     formzStatus = FormzSubmissionStatus.inProgress;
     notifyListeners();
 
+    debugPrint("🚀 [createProduct] Starting product creation...");
+    debugPrint("🚀 [createProduct] Product data: ${product.toCreate()}");
+    debugPrint("🚀 [createProduct] Images count: ${images.length}");
+
     final createResult = await _repository.createProduct(product);
+
     if (createResult.isRight()) {
       final productId = createResult.getOrElse(
         () => throw Exception("Unexpected error"),
       );
 
+      debugPrint("✅ [createProduct] Product created successfully!");
+      debugPrint("✅ [createProduct] Returned productId: $productId");
+      debugPrint("✅ [createProduct] productId type: ${productId.runtimeType}");
+
       if (images.isNotEmpty) {
+        debugPrint(
+          "📤 [createProduct] Uploading ${images.length} image(s) for productId: $productId",
+        );
+
         final uploadResult = await _repository.uploadImage(productId, images);
+
+        uploadResult.fold(
+          (error) =>
+              debugPrint("❌ [createProduct] Image upload FAILED: $error"),
+          (success) =>
+              debugPrint("✅ [createProduct] Image upload SUCCESS: $success"),
+        );
+
         if (uploadResult.isLeft()) {
           formzStatus = FormzSubmissionStatus.failure;
           notifyListeners();
           await fetchProducts();
           return;
         }
+      } else {
+        debugPrint("⚠️ [createProduct] No images to upload, skipping.");
       }
+
       formzStatus = FormzSubmissionStatus.success;
       notifyListeners();
       await fetchProducts();
     } else {
+      final error = createResult.fold((l) => l, (r) => "unknown");
+      debugPrint("❌ [createProduct] Product creation FAILED: $error");
       formzStatus = FormzSubmissionStatus.failure;
       notifyListeners();
     }
+  }
+
+  Future<bool> uploadImages(int productId, List<UploadImageModel> files) async {
+    debugPrint(
+      "📤 [uploadImages] Uploading ${files.length} file(s) for productId: $productId",
+    );
+
+    for (int i = 0; i < files.length; i++) {
+      final f = files[i];
+      debugPrint("   📎 File[$i]: name=${f.name}, size=${f.file.length} bytes");
+    }
+
+    final result = await _repository.uploadImage(productId, files);
+
+    result.fold(
+      (error) => debugPrint("❌ [uploadImages] Upload FAILED: $error"),
+      (success) => debugPrint("✅ [uploadImages] Upload SUCCESS: $success"),
+    );
+
+    if (result.isRight()) {
+      final res = result.getOrElse(() => throw Exception("Unexpected error"));
+      debugPrint("✅ [uploadImages] Server response: $res");
+      return true;
+    }
+    return false;
   }
 
   Future<void> editProduct(
@@ -90,16 +141,6 @@ class ProductsViewmodel extends ChangeNotifier {
       formzStatus = FormzSubmissionStatus.failure;
       notifyListeners();
     }
-  }
-
-  Future<bool> uploadImages(int productId, List<UploadImageModel> files) async {
-    final result = await _repository.uploadImage(productId, files);
-    if (result.isRight()) {
-      final res = result.getOrElse(() => throw Exception("Unexpected error"));
-      debugPrint("RESPONSE: $res");
-      return true;
-    }
-    return false;
   }
 
   Future<void> deleteProduct(int? productid) async {
