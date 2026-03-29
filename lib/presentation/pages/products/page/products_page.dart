@@ -40,6 +40,7 @@ class ProductsPage extends StatelessWidget {
                     ),
                     itemBuilder: (BuildContext context, int index) {
                       final product = viewmodel.products[index];
+                      print(viewmodel.products[index].images);
                       return Card(
                         color: AppColors.white50,
                         shape: RoundedRectangleBorder(
