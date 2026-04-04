@@ -171,5 +171,14 @@ abstract class  LocaleKeys {
   static const product_name = 'product_name';
   static const sold_amount = 'sold_amount';
   static const menu_sold_products = 'menu_sold_products';
+  static const status_new = 'status_new';
+  static const status_payment_created = 'status_payment_created';
+  static const status_payment_failed = 'status_payment_failed';
+  static const status_payment_succeeded = 'status_payment_succeeded';
+  static const payment_virtual_account = 'payment_virtual_account';
+  static const payment_mobile_phone = 'payment_mobile_phone';
+  static const payment_transfer = 'payment_transfer';
+  static const payment_foreign_easy_pay = 'payment_foreign_easy_pay';
+  static const total_revenue = 'total_revenue';
 
 }

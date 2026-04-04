@@ -3,6 +3,7 @@ import 'package:e_commerce_startup_web/data/models/category_model.dart';
 import 'package:e_commerce_startup_web/data/datasources/network/network_service.dart';
 import 'package:e_commerce_startup_web/presentation/widgets/network_image_loader.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
 import 'dart:typed_data';
@@ -54,292 +55,568 @@ class CategoryDialog {
           promptController.text.trim() != initialPrompt ||
           (selectedImageBytes != null) ||
           !initialHasIcon;
-
-      setState(() {
-        hasChanges = changed;
-      });
+      setState(() => hasChanges = changed);
     }
 
     return showDialog<void>(
       context: context,
       barrierDismissible: false,
-      builder: (BuildContext context) {
+      builder: (ctx) {
         return StatefulBuilder(
-          builder: (context, setState) {
+          builder: (ctx, setState) {
             uzController.addListener(() => checkForChanges(setState));
             enController.addListener(() => checkForChanges(setState));
             koController.addListener(() => checkForChanges(setState));
             promptController.addListener(() => checkForChanges(setState));
 
-            return AlertDialog(
-              title: Text(
-                category == null
-                    ? context.tr(LocaleKeys.create_category_title)
-                    : context.tr(LocaleKeys.edit_category_title),
+            final isEdit = category != null;
+            final canSave = !isUploading && (!isEdit || hasChanges);
+
+            return Dialog(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(20),
               ),
-              content: Container(
-                width: MediaQuery.of(context).size.width * 0.4,
-                constraints: BoxConstraints(
-                  maxHeight: MediaQuery.of(context).size.height * 0.7,
-                ),
-                child: SingleChildScrollView(
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      TextField(
-                        controller: uzController,
-                        decoration: InputDecoration(
-                          labelText: context.tr(
-                            LocaleKeys.category_name_uz_title,
+              clipBehavior: Clip.antiAlias,
+              child: SizedBox(
+                width: MediaQuery.of(ctx).size.width * 0.44,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    // ── Header ───────────────────────────────────────────────
+                    Container(
+                      padding: const EdgeInsets.fromLTRB(24, 20, 20, 20),
+                      decoration: const BoxDecoration(
+                        gradient: LinearGradient(
+                          colors: [Color(0xFFF97316), Color(0xFFFB923C)],
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                        ),
+                      ),
+                      child: Row(
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.all(10),
+                            decoration: BoxDecoration(
+                              color: Colors.white.withOpacity(0.2),
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: Icon(
+                              isEdit
+                                  ? CupertinoIcons.pencil_circle
+                                  : CupertinoIcons.plus_circle,
+                              color: Colors.white,
+                              size: 20,
+                            ),
                           ),
-                          border: const OutlineInputBorder(),
-                        ),
-                      ),
-                      const SizedBox(height: 16),
-                      TextField(
-                        controller: enController,
-                        decoration: InputDecoration(
-                          labelText: context.tr(
-                            LocaleKeys.category_name_en_title,
+                          const SizedBox(width: 14),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  isEdit ? 'Edit Category' : 'New Category',
+                                  style: TextStyle(
+                                    color: Colors.white.withOpacity(0.75),
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                                Text(
+                                  isEdit
+                                      ? ctx.tr(LocaleKeys.edit_category_title)
+                                      : ctx.tr(
+                                          LocaleKeys.create_category_title,
+                                        ),
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.w800,
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
-                          border: const OutlineInputBorder(),
-                        ),
-                      ),
-                      const SizedBox(height: 16),
-                      TextField(
-                        controller: koController,
-                        decoration: InputDecoration(
-                          labelText: context.tr(
-                            LocaleKeys.category_name_kr_title,
+                          IconButton(
+                            onPressed: isUploading
+                                ? null
+                                : () => Navigator.of(ctx).pop(),
+                            icon: const Icon(
+                              CupertinoIcons.xmark,
+                              color: Colors.white,
+                              size: 18,
+                            ),
+                            style: IconButton.styleFrom(
+                              backgroundColor: Colors.white.withOpacity(0.15),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                            ),
                           ),
-                          border: const OutlineInputBorder(),
-                        ),
+                        ],
                       ),
-                      const SizedBox(height: 16),
-                      TextField(
-                        controller: promptController,
-                        decoration: InputDecoration(
-                          labelText: context.tr(
-                            LocaleKeys.category_prompt_title,
-                          ),
-                          border: const OutlineInputBorder(),
-                        ),
-                        maxLines: 3,
-                      ),
-                      const SizedBox(height: 20),
-                      Text(
-                        context.tr(LocaleKeys.category_icon),
-                        style: const TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      Container(
-                        width: double.infinity,
-                        padding: const EdgeInsets.all(16),
-                        decoration: BoxDecoration(
-                          border: Border.all(color: Colors.grey.shade300),
-                          borderRadius: BorderRadius.circular(8),
-                        ),
+                    ),
+
+                    // ── Body ─────────────────────────────────────────────────
+                    Flexible(
+                      child: SingleChildScrollView(
+                        padding: const EdgeInsets.all(24),
                         child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            if (selectedImageBytes != null) ...[
-                              Container(
-                                width: 80,
-                                height: 80,
-                                decoration: BoxDecoration(
-                                  border: Border.all(color: Colors.grey),
-                                  borderRadius: BorderRadius.circular(8),
-                                ),
-                                child: ClipRRect(
-                                  borderRadius: BorderRadius.circular(8),
-                                  child: Image.memory(
-                                    selectedImageBytes!,
-                                    fit: BoxFit.cover,
+                            // Names row (flags removed)
+                            Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Expanded(
+                                  child: _buildTextField(
+                                    controller: uzController,
+                                    label: ctx.tr(
+                                      LocaleKeys.category_name_uz_title,
+                                    ),
+                                    enabled: !isUploading,
                                   ),
                                 ),
-                              ),
-                              const SizedBox(height: 8),
-                              Text(
-                                selectedImageName ??
-                                    context.tr(LocaleKeys.selected_image),
-                                style: const TextStyle(fontSize: 12),
-                                textAlign: TextAlign.center,
-                              ),
-                            ] else if (category != null &&
-                                _hasExistingIcon(category)) ...[
-                              Container(
-                                width: 80,
-                                height: 80,
-                                decoration: BoxDecoration(
-                                  border: Border.all(color: Colors.grey),
-                                  borderRadius: BorderRadius.circular(8),
-                                ),
-                                child: ClipRRect(
-                                  borderRadius: BorderRadius.circular(8),
-                                  child: NetworkImageLoader(
-                                    url: _getIconUrl(category),
-                                    width: 80,
-                                    height: 80,
+                                const SizedBox(width: 12),
+                                Expanded(
+                                  child: _buildTextField(
+                                    controller: enController,
+                                    label: ctx.tr(
+                                      LocaleKeys.category_name_en_title,
+                                    ),
+                                    enabled: !isUploading,
                                   ),
                                 ),
-                              ),
-                              const SizedBox(height: 8),
-                              Text(
-                                context.tr(LocaleKeys.current_icon),
-                                style: const TextStyle(fontSize: 12),
-                                textAlign: TextAlign.center,
-                              ),
-                            ] else ...[
-                              Container(
-                                width: 80,
-                                height: 80,
-                                decoration: BoxDecoration(
-                                  color: Colors.grey.shade200,
-                                  border: Border.all(
-                                    color: Colors.grey.shade300,
+                                const SizedBox(width: 12),
+                                Expanded(
+                                  child: _buildTextField(
+                                    controller: koController,
+                                    label: ctx.tr(
+                                      LocaleKeys.category_name_kr_title,
+                                    ),
+                                    enabled: !isUploading,
                                   ),
-                                  borderRadius: BorderRadius.circular(8),
                                 ),
-                                child: Icon(
-                                  Icons.add_photo_alternate,
-                                  size: 40,
-                                  color: Colors.grey.shade500,
-                                ),
-                              ),
-                            ],
-                            const SizedBox(height: 12),
-                            ElevatedButton.icon(
-                              onPressed: () async {
-                                final result = await FilePicker.platform
-                                    .pickFiles(
-                                      type: FileType.image,
-                                      withData: true,
-                                    );
-                                if (result != null &&
-                                    result.files.single.bytes != null) {
-                                  setState(() {
-                                    selectedImageBytes =
-                                        result.files.single.bytes;
-                                    selectedImageName =
-                                        result.files.single.name;
-                                  });
-                                  checkForChanges(setState);
-                                }
-                              },
-                              icon: const Icon(Icons.upload),
-                              label: Text(
-                                selectedImageBytes != null ||
-                                        _hasExistingIcon(category)
-                                    ? context.tr(LocaleKeys.change_icon)
-                                    : context.tr(LocaleKeys.upload_icon),
-                              ),
+                              ],
                             ),
-                            if (selectedImageBytes != null) ...[
-                              const SizedBox(height: 8),
-                              TextButton(
-                                onPressed: () {
-                                  setState(() {
-                                    selectedImageBytes = null;
-                                    selectedImageName = null;
-                                  });
-                                  checkForChanges(setState);
-                                },
-                                child: Text(
-                                  context.tr(LocaleKeys.remove_selected_image),
-                                  style: const TextStyle(color: Colors.red),
-                                ),
-                              ),
-                            ],
+                            const SizedBox(height: 16),
+
+                            // Prompt
+                            _buildTextField(
+                              controller: promptController,
+                              label: ctx.tr(LocaleKeys.category_prompt_title),
+                              icon: CupertinoIcons.text_alignleft,
+                              maxLines: 3,
+                              enabled: !isUploading,
+                            ),
+                            const SizedBox(height: 20),
+
+                            // Icon section
+                            _buildIconSection(
+                              ctx: ctx,
+                              category: category,
+                              selectedImageBytes: selectedImageBytes,
+                              selectedImageName: selectedImageName,
+                              isUploading: isUploading,
+                              onImageSelected: (bytes, name) {
+                                setState(() {
+                                  selectedImageBytes = bytes;
+                                  selectedImageName = name;
+                                });
+                                checkForChanges(setState);
+                              },
+                              onImageRemoved: () {
+                                setState(() {
+                                  selectedImageBytes = null;
+                                  selectedImageName = null;
+                                });
+                                checkForChanges(setState);
+                              },
+                            ),
                           ],
                         ),
                       ),
-                    ],
-                  ),
+                    ),
+
+                    // ── Footer ───────────────────────────────────────────────
+                    Container(
+                      padding: const EdgeInsets.fromLTRB(24, 16, 24, 20),
+                      decoration: const BoxDecoration(
+                        color: Color(0xFFF8F9FC),
+                        border: Border(
+                          top: BorderSide(color: Color(0xFFE5E7EB)),
+                        ),
+                      ),
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: OutlinedButton(
+                              onPressed: isUploading
+                                  ? null
+                                  : () => Navigator.of(ctx).pop(),
+                              style: OutlinedButton.styleFrom(
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 13,
+                                ),
+                                side: const BorderSide(
+                                  color: Color(0xFFD1D5DB),
+                                ),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                              ),
+                              child: Text(
+                                ctx.tr(LocaleKeys.cancel),
+                                style: const TextStyle(
+                                  color: Color(0xFF374151),
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: FilledButton(
+                              onPressed: canSave
+                                  ? () async {
+                                      if (uzController.text.trim().isEmpty ||
+                                          enController.text.trim().isEmpty ||
+                                          koController.text.trim().isEmpty ||
+                                          promptController.text
+                                              .trim()
+                                              .isEmpty) {
+                                        ScaffoldMessenger.of(ctx).showSnackBar(
+                                          SnackBar(
+                                            content: Row(
+                                              children: [
+                                                const Icon(
+                                                  CupertinoIcons
+                                                      .exclamationmark_circle,
+                                                  color: Colors.white,
+                                                  size: 16,
+                                                ),
+                                                const SizedBox(width: 8),
+                                                Text(
+                                                  ctx.tr(
+                                                    LocaleKeys
+                                                        .please_fill_required_fields,
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                            backgroundColor:
+                                                Colors.red.shade600,
+                                            behavior: SnackBarBehavior.floating,
+                                            shape: RoundedRectangleBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(10),
+                                            ),
+                                            margin: const EdgeInsets.all(16),
+                                          ),
+                                        );
+                                        return;
+                                      }
+                                      setState(() => isUploading = true);
+                                      try {
+                                        Navigator.of(ctx).pop();
+                                        await onTap(
+                                          uzTitle: uzController.text.trim(),
+                                          enTitle: enController.text.trim(),
+                                          koTitle: koController.text.trim(),
+                                          prompt: promptController.text.trim(),
+                                          categoryId: category?.id,
+                                          iconFile: selectedImageBytes,
+                                          iconFileName: selectedImageName,
+                                        );
+                                      } catch (_) {
+                                        setState(() => isUploading = false);
+                                      }
+                                    }
+                                  : null,
+                              style: FilledButton.styleFrom(
+                                backgroundColor: const Color(0xFFF97316),
+                                disabledBackgroundColor: Colors.grey.shade200,
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 13,
+                                ),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                              ),
+                              child: isUploading
+                                  ? Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        const SizedBox(
+                                          width: 16,
+                                          height: 16,
+                                          child: CircularProgressIndicator(
+                                            strokeWidth: 2,
+                                            color: Colors.white,
+                                          ),
+                                        ),
+                                        const SizedBox(width: 8),
+                                        Text(ctx.tr(LocaleKeys.processing)),
+                                      ],
+                                    )
+                                  : Text(
+                                      isEdit
+                                          ? ctx.tr(LocaleKeys.update)
+                                          : ctx.tr(LocaleKeys.create),
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.w600,
+                                        color: canSave
+                                            ? Colors.white
+                                            : Colors.grey.shade400,
+                                      ),
+                                    ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
                 ),
               ),
-              actions: [
-                TextButton(
-                  onPressed: isUploading
-                      ? null
-                      : () => Navigator.of(context).pop(),
-                  child: Text(context.tr(LocaleKeys.cancel)),
-                ),
-                ElevatedButton(
-                  onPressed: isUploading
-                      ? null
-                      : category == null || hasChanges
-                      ? () async {
-                          if (uzController.text.trim().isEmpty ||
-                              enController.text.trim().isEmpty ||
-                              koController.text.trim().isEmpty ||
-                              promptController.text.trim().isEmpty) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: Text(
-                                  context.tr(
-                                    LocaleKeys.please_fill_required_fields,
-                                  ),
-                                ),
-                                backgroundColor: Colors.red,
-                              ),
-                            );
-                            return;
-                          }
-
-                          setState(() {
-                            isUploading = true;
-                          });
-
-                          try {
-                            Navigator.of(context).pop();
-                            await onTap(
-                              uzTitle: uzController.text.trim(),
-                              enTitle: enController.text.trim(),
-                              koTitle: koController.text.trim(),
-                              prompt: promptController.text.trim(),
-                              categoryId: category?.id,
-                              iconFile: selectedImageBytes,
-                              iconFileName: selectedImageName,
-                            );
-                          } catch (e) {
-                            setState(() {
-                              isUploading = false;
-                            });
-                          }
-                        }
-                      : null,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: category != null && !hasChanges
-                        ? Colors.grey
-                        : null,
-                  ),
-                  child: isUploading
-                      ? Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            const SizedBox(
-                              width: 16,
-                              height: 16,
-                              child: CircularProgressIndicator(strokeWidth: 2),
-                            ),
-                            const SizedBox(width: 8),
-                            Text(context.tr(LocaleKeys.processing)),
-                          ],
-                        )
-                      : Text(
-                          category == null
-                              ? context.tr(LocaleKeys.create)
-                              : context.tr(LocaleKeys.update),
-                        ),
-                ),
-              ],
             );
           },
         );
       },
+    );
+  }
+
+  static Widget _buildTextField({
+    required TextEditingController controller,
+    required String label,
+    IconData? icon,
+    int maxLines = 1,
+    bool enabled = true,
+  }) {
+    return TextField(
+      controller: controller,
+      maxLines: maxLines,
+      enabled: enabled,
+      style: const TextStyle(fontSize: 13, color: Color(0xFF111827)),
+      decoration: InputDecoration(
+        labelText: label,
+        labelStyle: TextStyle(fontSize: 13, color: Colors.grey.shade500),
+        prefixIcon: icon != null
+            ? Icon(icon, size: 16, color: Colors.grey.shade400)
+            : null,
+        filled: true,
+        fillColor: const Color(0xFFF8F9FC),
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 14,
+          vertical: 12,
+        ),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(10),
+          borderSide: const BorderSide(color: Color(0xFFE5E7EB)),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(10),
+          borderSide: const BorderSide(color: Color(0xFFE5E7EB)),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(10),
+          borderSide: const BorderSide(color: Color(0xFFF97316), width: 1.5),
+        ),
+      ),
+    );
+  }
+
+  static Widget _buildIconSection({
+    required BuildContext ctx,
+    required CategoryModel? category,
+    required Uint8List? selectedImageBytes,
+    required String? selectedImageName,
+    required bool isUploading,
+    required void Function(Uint8List bytes, String name) onImageSelected,
+    required VoidCallback onImageRemoved,
+  }) {
+    final hasNew = selectedImageBytes != null;
+    final hasExisting = _hasExistingIcon(category);
+
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: const Color(0xFFF8F9FC),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: const Color(0xFFE5E7EB)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(6),
+                decoration: BoxDecoration(
+                  color: Colors.orange.shade50,
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Icon(
+                  CupertinoIcons.photo,
+                  size: 14,
+                  color: Colors.orange.shade600,
+                ),
+              ),
+              const SizedBox(width: 8),
+              Text(
+                ctx.tr(LocaleKeys.category_icon),
+                style: const TextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w600,
+                  color: Color(0xFF374151),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 14),
+          Row(
+            children: [
+              // Preview
+              Container(
+                width: 72,
+                height: 72,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(12),
+                  color: const Color(0xFFEEF2FF),
+                  border: Border.all(color: const Color(0xFFE5E7EB)),
+                ),
+                clipBehavior: Clip.antiAlias,
+                child: hasNew
+                    ? Image.memory(selectedImageBytes!, fit: BoxFit.cover)
+                    : hasExisting
+                    ? NetworkImageLoader(
+                        url: _getIconUrl(category!),
+                        width: 72,
+                        height: 72,
+                      )
+                    : Icon(
+                        CupertinoIcons.photo,
+                        size: 30,
+                        color: Colors.grey.shade400,
+                      ),
+              ),
+              const SizedBox(width: 16),
+
+              // Controls
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    if (hasNew) ...[
+                      Row(
+                        children: [
+                          const Icon(
+                            CupertinoIcons.checkmark_circle_fill,
+                            size: 14,
+                            color: Colors.green,
+                          ),
+                          const SizedBox(width: 5),
+                          Expanded(
+                            child: Text(
+                              selectedImageName ??
+                                  ctx.tr(LocaleKeys.selected_image),
+                              style: TextStyle(
+                                fontSize: 12,
+                                color: Colors.grey.shade600,
+                              ),
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 8),
+                    ] else if (hasExisting) ...[
+                      Row(
+                        children: [
+                          const Icon(
+                            CupertinoIcons.checkmark_circle_fill,
+                            size: 14,
+                            color: Colors.teal,
+                          ),
+                          const SizedBox(width: 5),
+                          Text(
+                            ctx.tr(LocaleKeys.current_icon),
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: Colors.grey.shade600,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 8),
+                    ],
+                    Row(
+                      children: [
+                        FilledButton.icon(
+                          onPressed: isUploading
+                              ? null
+                              : () async {
+                                  final result = await FilePicker.platform
+                                      .pickFiles(
+                                        type: FileType.image,
+                                        withData: true,
+                                      );
+                                  if (result != null &&
+                                      result.files.single.bytes != null) {
+                                    onImageSelected(
+                                      result.files.single.bytes!,
+                                      result.files.single.name,
+                                    );
+                                  }
+                                },
+                          icon: const Icon(Icons.upload, size: 14),
+                          label: Text(
+                            hasNew || hasExisting
+                                ? ctx.tr(LocaleKeys.change_icon)
+                                : ctx.tr(LocaleKeys.upload_icon),
+                            style: const TextStyle(fontSize: 12),
+                          ),
+                          style: FilledButton.styleFrom(
+                            backgroundColor: const Color(0xFFF97316),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 12,
+                              vertical: 8,
+                            ),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                          ),
+                        ),
+                        if (hasNew) ...[
+                          const SizedBox(width: 8),
+                          OutlinedButton(
+                            onPressed: onImageRemoved,
+                            style: OutlinedButton.styleFrom(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 12,
+                                vertical: 8,
+                              ),
+                              side: BorderSide(color: Colors.red.shade300),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                            ),
+                            child: Text(
+                              ctx.tr(LocaleKeys.remove_selected_image),
+                              style: TextStyle(
+                                fontSize: 12,
+                                color: Colors.red.shade600,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
     );
   }
 
