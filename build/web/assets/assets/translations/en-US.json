@@ -179,5 +179,14 @@
   "are_you_sure_delete_product": "are you sure to delete this product?",
  "product_name": "Product name",
   "sold_amount": "Sold amount",
-  "menu_sold_products": "Sold products"
+  "menu_sold_products": "Sold products",
+  "status_new": "New",
+  "status_payment_created": "Payment created",
+  "status_payment_failed": "Payment failed",
+  "status_payment_succeeded": "Payment succeeded",
+  "payment_virtual_account": "Virtual account",
+  "payment_mobile_phone": "Mobile phone",
+  "payment_transfer": "Bank transfer",
+  "payment_foreign_easy_pay": "Foreign easy payment",
+  "total_revenue": "Total revenue"
 }
