@@ -27,9 +27,33 @@ class OrdersRepositoryImpl extends OrdersRepository {
       final queryParams = {'page': page.toString(), 'size': size.toString()};
 
       final response = await NetworkService.get(api, cancelToken, queryParams);
-      final List<OrderModel> result = (response["data"]["list"] as List)
-          .map((e) => OrderModel.fromJson(e))
-          .toList();
+
+      // ✅ Print raw response body (first 500 chars to avoid clutter)
+      print(
+        "📦 Admin Orders Raw Response: ${response.toString().substring(0, response.toString().length > 500 ? 500 : response.toString().length)}...",
+      );
+
+      // ✅ Print the "data" field structure
+      print("🔍 Response data keys: ${response["data"]?.keys ?? "null"}");
+      print("🔍 Is list present? ${response["data"]?["list"] != null}");
+      print(
+        "🔍 List length: ${(response["data"]?["list"] as List?)?.length ?? 0}",
+      );
+
+      final List<OrderModel> result = (response["data"]["list"] as List).map((
+        e,
+      ) {
+        // ✅ Print each order's raw JSON before parsing
+        print("📄 Order JSON: $e");
+        return OrderModel.fromJson(e);
+      }).toList();
+
+      // ✅ Print first order's status after parsing
+      if (result.isNotEmpty) {
+        print("✅ First order status: ${result.first.orderStatus}");
+        print("✅ First order ID: ${result.first.orderId}");
+      }
+
       return Right(result);
     } on NetworkException catch (e) {
       if (e.type != NetworkExceptionType.cancelled) {
@@ -46,17 +70,15 @@ class OrdersRepositoryImpl extends OrdersRepository {
     try {
       final api = NetworkService.apiConfirmOrder;
       final cancelToken = cancelTokenManager.getToken("$api-$orderId");
-      final response = await NetworkService.put(
-        api,
-        cancelToken,
-        null,
-        {"orderId": orderId},
-      );
+      final response = await NetworkService.put(api, cancelToken, null, {
+        "orderId": orderId,
+      });
       final success = response?["success"] == true;
       if (success) {
         return const Right(true);
       } else {
-        final message = response?["error"]?["message"] ??
+        final message =
+            response?["error"]?["message"] ??
             LocaleKeys.confirm_order_failed.tr();
         GlobalSnackBar.showError(message);
         return Left(message);

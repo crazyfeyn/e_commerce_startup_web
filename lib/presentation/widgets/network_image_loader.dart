@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
-/// Oddiy xotira keshi (faqat sahifa ochiq turgan payt)
+/// Simple in‑memory cache (only while the page is open)
 class _MemoryImageCache {
   static final Map<String, Uint8List> _cache = {};
 
@@ -13,9 +13,6 @@ class _MemoryImageCache {
 
   static void set(String url, Uint8List bytes) => _cache[url] = bytes;
 }
-
-/// Oldingi `NetworkImageLoader` widgetini shu faylga qo‘shib ishlatish kerak.
-/// (shu koddan oldin biz yozgan versiyani qo‘ying)
 
 class ImageCarousel extends StatefulWidget {
   final List<String> urls;
@@ -37,6 +34,15 @@ class _ImageCarouselState extends State<ImageCarousel> {
 
   @override
   Widget build(BuildContext context) {
+    if (widget.urls.isEmpty) {
+      return Container(
+        color: Colors.grey.shade200,
+        child: const Center(
+          child: Icon(Icons.image_not_supported, size: 40, color: Colors.grey),
+        ),
+      );
+    }
+
     return SizedBox(
       width: double.infinity,
       height: double.infinity,
@@ -44,6 +50,7 @@ class _ImageCarouselState extends State<ImageCarousel> {
         alignment: AlignmentGeometry.center,
         children: [
           PageView.builder(
+            controller: _pageController,
             itemCount: widget.urls.length,
             itemBuilder: (context, index) {
               return SizedBox(
@@ -51,11 +58,11 @@ class _ImageCarouselState extends State<ImageCarousel> {
                 child: NetworkImageLoader(
                   url:
                       "${NetworkService.getService}${NetworkService.apiFileDownload(widget.urls[index])}",
+                  fit: BoxFit.cover, // now allowed
                 ),
               );
             },
           ),
-
           Positioned(
             bottom: 4,
             child: SmoothPageIndicator(
@@ -66,7 +73,6 @@ class _ImageCarouselState extends State<ImageCarousel> {
                 dotColor: Colors.grey.shade400,
                 dotHeight: 8,
                 dotWidth: 8,
-                // expansionFactor: 3,
                 spacing: 6,
               ),
             ),
@@ -81,12 +87,14 @@ class NetworkImageLoader extends StatefulWidget {
   final String url;
   final double? width;
   final double? height;
+  final BoxFit fit; // new parameter
 
   const NetworkImageLoader({
     super.key,
     required this.url,
     this.width,
     this.height,
+    this.fit = BoxFit.cover, // default
   });
 
   @override
@@ -102,7 +110,6 @@ class _NetworkImageLoaderState extends State<NetworkImageLoader> {
   void initState() {
     super.initState();
 
-    // Avval cache dan tekshiramiz
     final cached = _MemoryImageCache.get(widget.url);
     if (cached != null) {
       _imageBytes = cached;
@@ -119,18 +126,21 @@ class _NetworkImageLoaderState extends State<NetworkImageLoader> {
         options: Options(responseType: ResponseType.bytes),
       );
       final bytes = Uint8List.fromList(response.data!);
-      // Cache ga yozib qo‘yamiz
       _MemoryImageCache.set(widget.url, bytes);
 
-      setState(() {
-        _imageBytes = bytes;
-        _isLoading = false;
-      });
+      if (mounted) {
+        setState(() {
+          _imageBytes = bytes;
+          _isLoading = false;
+        });
+      }
     } catch (e) {
-      setState(() {
-        _hasError = true;
-        _isLoading = false;
-      });
+      if (mounted) {
+        setState(() {
+          _hasError = true;
+          _isLoading = false;
+        });
+      }
     }
   }
 
@@ -148,7 +158,7 @@ class _NetworkImageLoaderState extends State<NetworkImageLoader> {
       _imageBytes!,
       width: widget.width,
       height: widget.height,
-      fit: BoxFit.cover,
+      fit: widget.fit, // use the provided fit
     );
   }
 }
