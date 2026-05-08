@@ -187,5 +187,6 @@
   "payment_virtual_account": "Virtual account",
   "payment_mobile_phone": "Mobile phone",
   "payment_transfer": "Bank transfer",
-  "payment_foreign_easy_pay": "Foreign easy payment"
+  "payment_foreign_easy_pay": "Foreign easy payment",
+  "total_revenue": "Total revenue"
 }

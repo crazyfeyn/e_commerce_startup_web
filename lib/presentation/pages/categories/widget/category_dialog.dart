@@ -13,9 +13,7 @@ class CategoryDialog {
     required BuildContext context,
     CategoryModel? category,
     required Future<void> Function({
-      required String uzTitle,
-      required String enTitle,
-      required String koTitle,
+      required String titleEn,
       required String prompt,
       int? categoryId,
       Uint8List? iconFile,
@@ -23,22 +21,14 @@ class CategoryDialog {
     })
     onTap,
   }) async {
-    final uzController = TextEditingController(
-      text: category?.titleData?.uz ?? '',
-    );
-    final enController = TextEditingController(
+    final titleEnController = TextEditingController(
       text: category?.titleData?.en ?? '',
-    );
-    final koController = TextEditingController(
-      text: category?.titleData?.kor ?? '',
     );
     final promptController = TextEditingController(
       text: category?.description ?? '',
     );
 
-    final initialUz = uzController.text;
-    final initialEn = enController.text;
-    final initialKo = koController.text;
+    final initialTitleEn = titleEnController.text;
     final initialPrompt = promptController.text;
     final initialHasIcon = _hasExistingIcon(category);
 
@@ -49,12 +39,10 @@ class CategoryDialog {
 
     void checkForChanges(StateSetter setState) {
       final changed =
-          uzController.text.trim() != initialUz ||
-          enController.text.trim() != initialEn ||
-          koController.text.trim() != initialKo ||
+          titleEnController.text.trim() != initialTitleEn ||
           promptController.text.trim() != initialPrompt ||
           (selectedImageBytes != null) ||
-          !initialHasIcon;
+          (selectedImageBytes == null && !initialHasIcon);
       setState(() => hasChanges = changed);
     }
 
@@ -64,9 +52,7 @@ class CategoryDialog {
       builder: (ctx) {
         return StatefulBuilder(
           builder: (ctx, setState) {
-            uzController.addListener(() => checkForChanges(setState));
-            enController.addListener(() => checkForChanges(setState));
-            koController.addListener(() => checkForChanges(setState));
+            titleEnController.addListener(() => checkForChanges(setState));
             promptController.addListener(() => checkForChanges(setState));
 
             final isEdit = category != null;
@@ -163,47 +149,58 @@ class CategoryDialog {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            // Names row (flags removed)
-                            Row(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Expanded(
-                                  child: _buildTextField(
-                                    controller: uzController,
-                                    label: ctx.tr(
-                                      LocaleKeys.category_name_uz_title,
-                                    ),
-                                    enabled: !isUploading,
-                                  ),
+                            // Info Banner
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 12,
+                                vertical: 8,
+                              ),
+                              decoration: BoxDecoration(
+                                color: const Color(0xFFFFF7ED),
+                                borderRadius: BorderRadius.circular(8),
+                                border: Border.all(
+                                  color: const Color(0xFFFED7AA),
                                 ),
-                                const SizedBox(width: 12),
-                                Expanded(
-                                  child: _buildTextField(
-                                    controller: enController,
-                                    label: ctx.tr(
-                                      LocaleKeys.category_name_en_title,
-                                    ),
-                                    enabled: !isUploading,
+                              ),
+                              child: Row(
+                                children: [
+                                  const Icon(
+                                    CupertinoIcons.sparkles,
+                                    size: 14,
+                                    color: Color(0xFFF97316),
                                   ),
-                                ),
-                                const SizedBox(width: 12),
-                                Expanded(
-                                  child: _buildTextField(
-                                    controller: koController,
-                                    label: ctx.tr(
-                                      LocaleKeys.category_name_kr_title,
+                                  const SizedBox(width: 8),
+                                  Expanded(
+                                    child: Text(
+                                      "Enter category name in English. The backend will automatically translate it to all supported languages (Uzbek, Korean, etc.) using Anthropic AI.",
+                                      style: TextStyle(
+                                        fontSize: 11,
+                                        color: Colors.orange.shade700,
+                                        height: 1.4,
+                                      ),
                                     ),
-                                    enabled: !isUploading,
                                   ),
-                                ),
-                              ],
+                                ],
+                              ),
+                            ),
+                            const SizedBox(height: 20),
+
+                            // Category Name (English only - source for translation)
+                            _buildTextField(
+                              controller: titleEnController,
+                              label: "Category Name (English)",
+                              hintText:
+                                  "e.g. Electronics, Clothing, Fresh Food",
+                              enabled: !isUploading,
                             ),
                             const SizedBox(height: 16),
 
-                            // Prompt
+                            // Prompt / Description (for Anthropic context)
                             _buildTextField(
                               controller: promptController,
                               label: ctx.tr(LocaleKeys.category_prompt_title),
+                              hintText:
+                                  "Describe what this category is about. This helps AI generate accurate translations.",
                               icon: CupertinoIcons.text_alignleft,
                               maxLines: 3,
                               enabled: !isUploading,
@@ -278,9 +275,9 @@ class CategoryDialog {
                             child: FilledButton(
                               onPressed: canSave
                                   ? () async {
-                                      if (uzController.text.trim().isEmpty ||
-                                          enController.text.trim().isEmpty ||
-                                          koController.text.trim().isEmpty ||
+                                      if (titleEnController.text
+                                              .trim()
+                                              .isEmpty ||
                                           promptController.text
                                               .trim()
                                               .isEmpty) {
@@ -319,9 +316,8 @@ class CategoryDialog {
                                       try {
                                         Navigator.of(ctx).pop();
                                         await onTap(
-                                          uzTitle: uzController.text.trim(),
-                                          enTitle: enController.text.trim(),
-                                          koTitle: koController.text.trim(),
+                                          titleEn: titleEnController.text
+                                              .trim(),
                                           prompt: promptController.text.trim(),
                                           categoryId: category?.id,
                                           iconFile: selectedImageBytes,
@@ -387,6 +383,7 @@ class CategoryDialog {
   static Widget _buildTextField({
     required TextEditingController controller,
     required String label,
+    String? hintText,
     IconData? icon,
     int maxLines = 1,
     bool enabled = true,
@@ -398,6 +395,8 @@ class CategoryDialog {
       style: const TextStyle(fontSize: 13, color: Color(0xFF111827)),
       decoration: InputDecoration(
         labelText: label,
+        hintText: hintText,
+        hintStyle: TextStyle(fontSize: 12, color: Colors.grey.shade400),
         labelStyle: TextStyle(fontSize: 13, color: Colors.grey.shade500),
         prefixIcon: icon != null
             ? Icon(icon, size: 16, color: Colors.grey.shade400)

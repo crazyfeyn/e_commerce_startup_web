@@ -51,10 +51,10 @@ class _ProductDialogState extends State<ProductDialog> {
   final _priceCtr = TextEditingController();
   final _amountCtr = TextEditingController();
   final _currencyCtr = TextEditingController();
-  final _nameUzCtr = TextEditingController();
-  final _nameKrCtr = TextEditingController();
-  final _nameEnCtr = TextEditingController();
-  final _promptCtr = TextEditingController();
+
+  // Only English title and description — backend translates via Anthropic
+  final _titleEnCtr = TextEditingController();
+  final _descriptionEnCtr = TextEditingController();
 
   List<CategoryModel> categories = [];
   bool isLoadingCat = true;
@@ -77,10 +77,11 @@ class _ProductDialogState extends State<ProductDialog> {
     _priceCtr.text = widget.product?.price?.toString() ?? "";
     _amountCtr.text = widget.product?.amount?.toString() ?? "";
     _currencyCtr.text = widget.product?.currency ?? "";
-    _nameUzCtr.text = widget.product?.titleData?.uz ?? "";
-    _nameKrCtr.text = widget.product?.titleData?.kor ?? "";
-    _nameEnCtr.text = widget.product?.titleData?.en ?? "";
-    _promptCtr.text = widget.product?.description ?? "";
+
+    // Use English title/description from existing product if editing
+    _titleEnCtr.text = widget.product?.titleData?.en ?? "";
+    _descriptionEnCtr.text = widget.product?.description ?? "";
+
     selectCategory = widget.product?.categoryId;
     selectMeasurement = widget.product?.measurementId;
 
@@ -97,10 +98,8 @@ class _ProductDialogState extends State<ProductDialog> {
     _priceCtr.dispose();
     _amountCtr.dispose();
     _currencyCtr.dispose();
-    _nameUzCtr.dispose();
-    _nameKrCtr.dispose();
-    _nameEnCtr.dispose();
-    _promptCtr.dispose();
+    _titleEnCtr.dispose();
+    _descriptionEnCtr.dispose();
     super.dispose();
   }
 
@@ -430,44 +429,60 @@ class _ProductDialogState extends State<ProductDialog> {
                         _buildErrorText(measurementError!),
                       const SizedBox(height: 20),
 
-                      // Localization Section
+                      // Content Section — English only, backend auto-translates
                       _buildSectionTitle(
                         context,
-                        "Localization",
-                        CupertinoIcons.globe,
+                        "Product Content",
+                        CupertinoIcons.doc_text,
+                      ),
+                      const SizedBox(height: 4),
+                      // Hint banner explaining auto-translation
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 8,
+                        ),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFFFF7ED),
+                          borderRadius: BorderRadius.circular(8),
+                          border: Border.all(color: const Color(0xFFFED7AA)),
+                        ),
+                        child: Row(
+                          children: [
+                            const Icon(
+                              CupertinoIcons.sparkles,
+                              size: 14,
+                              color: Color(0xFFF97316),
+                            ),
+                            const SizedBox(width: 8),
+                            Expanded(
+                              child: Text(
+                                "Enter title and description in English. The backend will automatically translate them into all supported languages.",
+                                style: TextStyle(
+                                  fontSize: 11,
+                                  color: Colors.orange.shade700,
+                                  height: 1.4,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                       const SizedBox(height: 12),
                       CustomTextField(
-                        ctr: _nameUzCtr,
-                        title: context.tr(LocaleKeys.product_name_uz_title),
-                        hintText: context.tr(LocaleKeys.product_name_uz_hint),
+                        ctr: _titleEnCtr,
+                        title: "Product Title (English)",
+                        hintText: "e.g. Organic Green Tea",
                         validator: (v) => (v == null || v.isEmpty)
                             ? context.tr(LocaleKeys.empty_filed)
                             : null,
                       ),
                       const SizedBox(height: 12),
                       CustomTextField(
-                        ctr: _nameKrCtr,
-                        title: context.tr(LocaleKeys.product_name_kr_title),
-                        hintText: context.tr(LocaleKeys.product_name_kr_hint),
-                        validator: (v) => (v == null || v.isEmpty)
-                            ? context.tr(LocaleKeys.empty_filed)
-                            : null,
-                      ),
-                      const SizedBox(height: 12),
-                      CustomTextField(
-                        ctr: _nameEnCtr,
-                        title: context.tr(LocaleKeys.product_name_en_title),
-                        hintText: context.tr(LocaleKeys.product_name_en_hint),
-                        validator: (v) => (v == null || v.isEmpty)
-                            ? context.tr(LocaleKeys.empty_filed)
-                            : null,
-                      ),
-                      const SizedBox(height: 12),
-                      CustomTextField(
-                        ctr: _promptCtr,
-                        title: context.tr(LocaleKeys.product_prompt_title),
-                        hintText: context.tr(LocaleKeys.product_prompt_hint),
+                        ctr: _descriptionEnCtr,
+                        title: "Description (English)",
+                        hintText:
+                            "Describe the product in English. It will be translated automatically.",
                         minLines: 3,
                         maxLines: 5,
                         validator: (v) => (v == null || v.isEmpty)
@@ -536,13 +551,15 @@ class _ProductDialogState extends State<ProductDialog> {
                                 final amount = double.tryParse(
                                   _amountCtr.text.trim(),
                                 );
-                                final nameUz = _nameUzCtr.text.trim();
-                                final nameKr = _nameKrCtr.text.trim();
-                                final nameEn = _nameEnCtr.text.trim();
-                                final prompt = _promptCtr.text.trim();
+                                final titleEn = _titleEnCtr.text.trim();
+                                final descriptionEn = _descriptionEnCtr.text
+                                    .trim();
 
                                 setState(() => isUploading = true);
                                 Navigator.of(context).pop();
+
+                                // ✅ FIX: Use TitleData.englishOnly() – only English is sent.
+                                // Backend will auto-translate into all 29 languages.
                                 await widget.onTap?.call(
                                   newImages,
                                   ProductModel(
@@ -553,12 +570,9 @@ class _ProductDialogState extends State<ProductDialog> {
                                     currency: currency,
                                     amount: amount,
                                     measurementId: selectMeasurement,
-                                    titleData: TitleData(
-                                      uz: nameUz,
-                                      kor: nameKr,
-                                      en: nameEn,
-                                    ),
-                                    description: prompt,
+                                    title: titleEn,
+                                    titleData: TitleData.englishOnly(titleEn),
+                                    description: descriptionEn,
                                   ),
                                 );
                                 setState(() => isUploading = false);

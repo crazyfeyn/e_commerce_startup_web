@@ -12,7 +12,7 @@ String categoryModelToMap(CategoryModel data) => json.encode(data.toMap());
 class CategoryModel {
   final int? id;
   final TitleData? titleData;
-  final String? description;
+  final String? description; // This is the prompt for Anthropic
   final String? imageIdentity;
 
   CategoryModel({
@@ -55,17 +55,18 @@ class TitleData {
   final String? en;
   final String? kor;
   final String? uz;
+  // Backend will add more languages via Anthropic
 
   TitleData({this.en, this.kor, this.uz});
 
   String? getTitle(String langCode) {
     switch (langCode) {
       case "uz":
-        return uz;
+        return uz ?? en; // Fallback to English if Uzbek not available
       case "en":
         return en;
-      default:
-        return kor;
+      default: // ko, etc.
+        return kor ?? en; // Fallback to English
     }
   }
 
@@ -76,4 +77,7 @@ class TitleData {
       TitleData(en: json["en"], kor: json["kor"], uz: json["uz"]);
 
   Map<String, dynamic> toMap() => {"en": en, "kor": kor, "uz": uz};
+
+  /// Create TitleData with only English (backend will translate)
+  factory TitleData.englishOnly(String title) => TitleData(en: title);
 }
