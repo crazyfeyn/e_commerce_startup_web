@@ -26,20 +26,21 @@ class CategoriesViewmodel extends ChangeNotifier {
     }
   }
 
+  // NEW: Create category with only English title + prompt
   Future<void> createCategory({
-    required String uzTitle,
-    required String enTitle,
-    required String koTitle,
+    required String titleEn,
     required String prompt,
     Uint8List? iconFile,
     String? iconFileName,
-    int? categoryId,
   }) async {
     formzStatus = FormzSubmissionStatus.inProgress;
     notifyListeners();
+
     try {
-      final title = {"uz": uzTitle, "en": enTitle, "kor": koTitle};
-      final createResult = await _repository.createCategory(title, prompt);
+      // Send only English title (backend will auto-translate via Anthropic)
+      final titleData = {"en": titleEn};
+
+      final createResult = await _repository.createCategory(titleData, prompt);
 
       if (createResult.isRight()) {
         final createdCategoryId = createResult.getOrElse(
@@ -48,18 +49,11 @@ class CategoriesViewmodel extends ChangeNotifier {
 
         if (createdCategoryId != null) {
           if (iconFile != null && iconFileName != null) {
-            final uploadResult = await _repository.uploadIcon(
+            await _repository.uploadIcon(
               categoryId: createdCategoryId,
               iconFile: iconFile,
               fileName: iconFileName,
             );
-
-            if (uploadResult.isLeft()) {
-              formzStatus = FormzSubmissionStatus.success;
-              notifyListeners();
-              await fetchCategories();
-              return;
-            }
           }
           await fetchCategories();
           return;
@@ -77,11 +71,10 @@ class CategoriesViewmodel extends ChangeNotifier {
     }
   }
 
+  // NEW: Edit category with only English title + prompt
   Future<void> editCategory({
     int? categoryId,
-    required String uzTitle,
-    required String enTitle,
-    required String koTitle,
+    required String titleEn,
     required String prompt,
     Uint8List? iconFile,
     String? iconFileName,
@@ -92,12 +85,12 @@ class CategoriesViewmodel extends ChangeNotifier {
     notifyListeners();
 
     try {
-      final title = {"uz": uzTitle, "en": enTitle, "kor": koTitle};
+      // Send only English title (backend will re-translate via Anthropic)
+      final titleData = {"en": titleEn};
 
-      // Step 1: Update category data
       final editResult = await _repository.editCategory(
         categoryId,
-        title,
+        titleData,
         prompt,
       );
 
@@ -108,20 +101,12 @@ class CategoriesViewmodel extends ChangeNotifier {
 
         if (success) {
           if (iconFile != null && iconFileName != null) {
-            final uploadResult = await _repository.uploadIcon(
+            await _repository.uploadIcon(
               categoryId: categoryId,
               iconFile: iconFile,
               fileName: iconFileName,
             );
-
-            if (uploadResult.isLeft()) {
-              formzStatus = FormzSubmissionStatus.success;
-              notifyListeners();
-              await fetchCategories();
-              return;
-            }
           }
-
           await fetchCategories();
           return;
         }

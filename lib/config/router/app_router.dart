@@ -1,5 +1,6 @@
 import 'package:e_commerce_startup_web/data/datasources/database/db_service.dart';
 import 'package:e_commerce_startup_web/presentation/pages/categories/page/categories_page.dart';
+import 'package:e_commerce_startup_web/presentation/pages/chat/page/chat_page.dart';
 import 'package:e_commerce_startup_web/presentation/pages/sold_products/page/sold_products.dart';
 import 'package:e_commerce_startup_web/presentation/pages/login/page/login_page.dart';
 import 'package:e_commerce_startup_web/presentation/pages/orders/page/orders_page.dart';
@@ -60,6 +61,10 @@ class AppRouter {
           GoRoute(
             path: SoldProductsPage.path,
             builder: (context, state) => const SoldProductsPage(),
+          ),
+          GoRoute(
+            path: ChatPage.path,
+            builder: (context, state) => const ChatPage(),
           ),
         ],
       ),

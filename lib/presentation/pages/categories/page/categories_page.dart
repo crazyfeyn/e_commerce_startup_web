@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:e_commerce_startup_web/core/utils/app_colors.dart';
 import 'package:e_commerce_startup_web/core/utils/app_enums.dart';
 import 'package:e_commerce_startup_web/core/utils/locale_keys.g.dart';
@@ -10,16 +12,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-// Flex weights: ID | Icon | UZ | KR | EN | Prompt | Actions
-const List<int> _flex = [
-  1,
-  1,
-  2,
-  2,
-  2,
-  2,
-  2,
-]; // increased actions flex, decreased prompt
+// Flex weights: ID | Icon | EN (now primary) | UZ | KR | Prompt | Actions
+const List<int> _flex = [1, 1, 2, 2, 2, 2, 2];
 
 class CategoriesPage extends StatelessWidget {
   static const String path = "/categories";
@@ -68,7 +62,7 @@ class CategoriesPage extends StatelessWidget {
             child: const Icon(
               CupertinoIcons.square_grid_2x2,
               size: 18,
-              color: const Color(0xFFF97316),
+              color: Color(0xFFF97316),
             ),
           ),
           const SizedBox(width: 12),
@@ -203,9 +197,9 @@ class CategoriesPage extends StatelessWidget {
     final labels = [
       context.tr(LocaleKeys.id),
       context.tr(LocaleKeys.icon),
-      context.tr(LocaleKeys.category_name_uz_title),
-      context.tr(LocaleKeys.category_name_kr_title),
-      context.tr(LocaleKeys.category_name_en_title),
+      "EN Title", // Primary input language
+      "UZ Title", // Auto-translated
+      "KR Title", // Auto-translated
       context.tr(LocaleKeys.category_prompt_title),
       context.tr(LocaleKeys.actions),
     ];
@@ -258,7 +252,7 @@ class CategoriesPage extends StatelessWidget {
       ),
       child: Row(
         children: [
-          // ── ID ────────────────────────────────────────────────────────────
+          // ID
           Expanded(
             flex: _flex[0],
             child: Padding(
@@ -288,7 +282,7 @@ class CategoriesPage extends StatelessWidget {
             ),
           ),
 
-          // ── Icon ──────────────────────────────────────────────────────────
+          // Icon
           Expanded(
             flex: _flex[1],
             child: Padding(
@@ -297,34 +291,34 @@ class CategoriesPage extends StatelessWidget {
             ),
           ),
 
-          // ── UZ ────────────────────────────────────────────────────────────
+          // EN Title (original)
           Expanded(
             flex: _flex[2],
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 12),
-              child: _buildNameCell(category.titleData?.uz ?? ''),
-            ),
-          ),
-
-          // ── KR ────────────────────────────────────────────────────────────
-          Expanded(
-            flex: _flex[3],
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 12),
-              child: _buildNameCell(category.titleData?.kor ?? ''),
-            ),
-          ),
-
-          // ── EN ────────────────────────────────────────────────────────────
-          Expanded(
-            flex: _flex[4],
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 12),
               child: _buildNameCell(category.titleData?.en ?? ''),
             ),
           ),
 
-          // ── Prompt ────────────────────────────────────────────────────────
+          // UZ Title (auto-translated)
+          Expanded(
+            flex: _flex[3],
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 12),
+              child: _buildNameCell(category.titleData?.uz ?? ''),
+            ),
+          ),
+
+          // KR Title (auto-translated)
+          Expanded(
+            flex: _flex[4],
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 12),
+              child: _buildNameCell(category.titleData?.kor ?? ''),
+            ),
+          ),
+
+          // Prompt (description used for Anthropic)
           Expanded(
             flex: _flex[5],
             child: Padding(
@@ -342,7 +336,7 @@ class CategoriesPage extends StatelessWidget {
             ),
           ),
 
-          // ── Actions ───────────────────────────────────────────────────────
+          // Actions
           Expanded(
             flex: _flex[6],
             child: Padding(
@@ -356,18 +350,14 @@ class CategoriesPage extends StatelessWidget {
                       category: category,
                       onTap:
                           ({
-                            required uzTitle,
-                            required enTitle,
-                            required koTitle,
-                            required prompt,
-                            categoryId,
-                            iconFile,
-                            iconFileName,
+                            required String titleEn,
+                            required String prompt,
+                            int? categoryId,
+                            Uint8List? iconFile,
+                            String? iconFileName,
                           }) => viewmodel.editCategory(
                             categoryId: categoryId,
-                            uzTitle: uzTitle,
-                            enTitle: enTitle,
-                            koTitle: koTitle,
+                            titleEn: titleEn,
                             prompt: prompt,
                             iconFile: iconFile,
                             iconFileName: iconFileName,
@@ -402,7 +392,6 @@ class CategoriesPage extends StatelessWidget {
     );
   }
 
-  // Removed flags, just show name with ellipsis
   Widget _buildNameCell(String name) {
     if (name.isEmpty) {
       return Text(
@@ -472,8 +461,8 @@ class CategoriesPage extends StatelessWidget {
         onTap: onPressed,
         borderRadius: BorderRadius.circular(8),
         child: Container(
-          width: 28, // reduced from 32
-          height: 28, // reduced from 32
+          width: 28,
+          height: 28,
           decoration: BoxDecoration(
             color: bg,
             borderRadius: BorderRadius.circular(8),
@@ -490,17 +479,13 @@ class CategoriesPage extends StatelessWidget {
         context: context,
         onTap:
             ({
-              required uzTitle,
-              required enTitle,
-              required koTitle,
-              required prompt,
-              categoryId,
-              iconFile,
-              iconFileName,
+              required String titleEn,
+              required String prompt,
+              int? categoryId,
+              Uint8List? iconFile,
+              String? iconFileName,
             }) => viewmodel.createCategory(
-              uzTitle: uzTitle,
-              enTitle: enTitle,
-              koTitle: koTitle,
+              titleEn: titleEn,
               prompt: prompt,
               iconFile: iconFile,
               iconFileName: iconFileName,
@@ -531,7 +516,6 @@ class CategoriesPage extends StatelessWidget {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              // Header
               Container(
                 padding: const EdgeInsets.all(20),
                 decoration: BoxDecoration(
@@ -568,8 +552,6 @@ class CategoriesPage extends StatelessWidget {
                   ],
                 ),
               ),
-
-              // Body
               Padding(
                 padding: const EdgeInsets.all(20),
                 child: Text(
@@ -588,8 +570,6 @@ class CategoriesPage extends StatelessWidget {
                   ),
                 ),
               ),
-
-              // Footer
               Container(
                 padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
                 child: Row(

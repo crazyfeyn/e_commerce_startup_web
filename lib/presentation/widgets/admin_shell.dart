@@ -3,11 +3,13 @@ import 'package:e_commerce_startup_web/core/utils/app_colors.dart';
 import 'package:e_commerce_startup_web/core/utils/app_styles.dart';
 import 'package:e_commerce_startup_web/core/utils/locale_keys.g.dart';
 import 'package:e_commerce_startup_web/presentation/pages/categories/page/categories_page.dart';
+import 'package:e_commerce_startup_web/presentation/pages/chat/page/chat_page.dart';
 import 'package:e_commerce_startup_web/presentation/pages/sold_products/page/sold_products.dart';
 import 'package:e_commerce_startup_web/presentation/pages/orders/page/orders_page.dart';
 import 'package:e_commerce_startup_web/presentation/pages/products/page/products_page.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:easy_sidemenu/easy_sidemenu.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
@@ -99,6 +101,11 @@ class _AdminShellState extends State<AdminShell> {
                 onTap: onChanged,
                 icon: Icon(Icons.location_city),
               ),
+              SideMenuItem(
+                title: 'HilolMate',
+                onTap: onChanged,
+                icon: Icon(CupertinoIcons.sparkles),
+              ),
             ],
           ),
           Expanded(child: widget.child),
@@ -119,6 +126,7 @@ class _AdminShellState extends State<AdminShell> {
       1 => CategoriesPage.path,
       2 => ProductsPage.path,
       3 => SoldProductsPage.path,
+      4 => ChatPage.path,
       _ => OrdersPage.path,
     };
   }
