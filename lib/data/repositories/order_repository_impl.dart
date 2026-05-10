@@ -7,6 +7,7 @@ import 'package:e_commerce_startup_web/data/datasources/network/network_service.
 import 'package:e_commerce_startup_web/data/models/order_model.dart';
 import 'package:e_commerce_startup_web/domain/repositories/orders_repository.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:flutter/cupertino.dart';
 
 class OrdersRepositoryImpl extends OrdersRepository {
   late final CancelTokenManager cancelTokenManager;
@@ -69,16 +70,89 @@ class OrdersRepositoryImpl extends OrdersRepository {
   Future<Either<String, bool>> confirmOrder(int orderId) async {
     try {
       final api = NetworkService.apiConfirmOrder;
+
+      debugPrint("========== CONFIRM ORDER ==========");
+      debugPrint("API: $api");
+      debugPrint("Order ID: $orderId");
+
       final cancelToken = cancelTokenManager.getToken("$api-$orderId");
+
       final response = await NetworkService.put(api, cancelToken, null, {
         "orderId": orderId,
       });
+
+      debugPrint("📦 Raw Response: $response");
+
       final success = response?["success"] == true;
+
+      debugPrint("✅ Success Value: $success");
+
+      // Print updated order state if backend returns it
+      if (response?["data"] != null) {
+        debugPrint("📄 Updated Order Data: ${response["data"]}");
+
+        debugPrint("📌 Updated Status: ${response["data"]["orderStatus"]}");
+      }
+
       if (success) {
+        debugPrint("🎉 Order state changed successfully");
+        debugPrint("===================================");
+
         return const Right(true);
       } else {
         final message =
             response?["error"]?["message"] ??
+            LocaleKeys.confirm_order_failed.tr();
+
+        debugPrint("❌ Failed Message: $message");
+        debugPrint("===================================");
+
+        GlobalSnackBar.showError(message);
+
+        return Left(message);
+      }
+    } on NetworkException catch (e) {
+      debugPrint("========== NETWORK ERROR ==========");
+      debugPrint("Type: ${e.type}");
+      debugPrint("Message: ${e.message}");
+      debugPrint("===================================");
+
+      if (e.type != NetworkExceptionType.cancelled) {
+        GlobalSnackBar.showError(e.message);
+      }
+
+      return Left(e.toString());
+    } catch (e, stackTrace) {
+      debugPrint("========== UNKNOWN ERROR ==========");
+      debugPrint("Error: $e");
+      debugPrint("StackTrace: $stackTrace");
+      debugPrint("===================================");
+
+      return Left(e.toString());
+    }
+  }
+
+  @override
+  Future<Either<String, bool>> editOrderStatus(
+    int orderId,
+    String status,
+  ) async {
+    try {
+      final api = NetworkService.apiEditOrderStatus;
+      final cancelToken = cancelTokenManager.getToken("$api-$orderId-$status");
+
+      final response = await NetworkService.put(api, cancelToken, null, {
+        'orderId': orderId,
+        'status': status,
+      });
+
+      final success = response?['success'] == true;
+
+      if (success) {
+        return const Right(true);
+      } else {
+        final message =
+            response?['error']?['message'] ??
             LocaleKeys.confirm_order_failed.tr();
         GlobalSnackBar.showError(message);
         return Left(message);

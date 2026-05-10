@@ -13,8 +13,10 @@ class OrdersViewmodel extends ChangeNotifier {
   FormzSubmissionStatus formzStatus = FormzSubmissionStatus.inProgress;
   List<OrderModel> orders = [];
   final Set<int> _confirmingOrders = {};
+  final Set<int> _editingOrders = {};
 
   bool isOrderConfirming(int orderId) => _confirmingOrders.contains(orderId);
+  bool isOrderEditing(int orderId) => _editingOrders.contains(orderId);
 
   Future<void> fetchOrders({bool showLoader = true}) async {
     if (showLoader) {
@@ -45,6 +47,24 @@ class OrdersViewmodel extends ChangeNotifier {
     }
 
     _confirmingOrders.remove(orderId);
+    notifyListeners();
+
+    return isSuccess;
+  }
+
+  Future<bool> editOrderStatus(int orderId, String status) async {
+    if (_editingOrders.contains(orderId)) return false;
+    _editingOrders.add(orderId);
+    notifyListeners();
+
+    final result = await _repository.editOrderStatus(orderId, status);
+    final isSuccess = result.getOrElse(() => false);
+
+    if (isSuccess) {
+      await fetchOrders(showLoader: false);
+    }
+
+    _editingOrders.remove(orderId);
     notifyListeners();
 
     return isSuccess;

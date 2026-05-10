@@ -1,3 +1,5 @@
+import 'package:e_commerce_startup_web/data/models/product_model.dart';
+
 /// Simplified product model used in order lists (admin and client).
 /// Matches the structure returned by /api/v1/order/get-all and /api/v1/admin/order/get-all.
 class OrderProductModel {
@@ -7,6 +9,8 @@ class OrderProductModel {
   final String currency;
   final int amount;
   final int measurementId;
+  final String? title;
+  final TitleData? titleData;
 
   OrderProductModel({
     required this.orderId,
@@ -15,7 +19,17 @@ class OrderProductModel {
     required this.currency,
     required this.amount,
     required this.measurementId,
+    this.title,
+    this.titleData,
   });
+
+  /// Returns the best available display name for the product.
+  String displayName(String langCode) {
+    final localized = titleData?.getLocalized(langCode);
+    if (localized != null && localized.isNotEmpty) return localized;
+    if (title != null && title!.isNotEmpty) return title!;
+    return '#$productId';
+  }
 
   factory OrderProductModel.fromJson(Map<String, dynamic> json) {
     return OrderProductModel(
@@ -25,6 +39,10 @@ class OrderProductModel {
       currency: json['currency'] ?? '',
       amount: json['amount'] ?? 0,
       measurementId: json['measurementId'] ?? 0,
+      title: json['title'] as String?,
+      titleData: json['titleData'] != null
+          ? TitleData.fromMap(json['titleData'] as Map<String, dynamic>)
+          : null,
     );
   }
 
@@ -36,6 +54,8 @@ class OrderProductModel {
       'currency': currency,
       'amount': amount,
       'measurementId': measurementId,
+      'title': title,
+      'titleData': titleData?.toMap(),
     };
   }
 }

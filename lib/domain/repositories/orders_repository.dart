@@ -7,5 +7,6 @@ abstract class OrdersRepository {
     int size = 100,
   });
   Future<Either<String, bool>> confirmOrder(int orderId);
+  Future<Either<String, bool>> editOrderStatus(int orderId, String status);
   void dispose();
 }

@@ -2,17 +2,26 @@ import 'package:e_commerce_startup_web/core/utils/locale_keys.g.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 
-// Real backend statuses: NEW, PAYMENT_CREATED, PAYMENT_FAILED, PAYMENT_SUCCEEDED, CANCELLED, DONE, PROCESSING (rare)
 Color getStatusColor(String status) {
   switch (status.toUpperCase()) {
     case 'NEW':
       return Colors.orange.shade50;
+    case 'WAITING':
+      return Colors.amber.shade50;
+    case 'CONFIRMED':
+      return Colors.indigo.shade50;
     case 'PAYMENT_CREATED':
       return Colors.blue.shade50;
+    case 'PAYMENT_PENDING':
+      return Colors.cyan.shade50;
     case 'PAYMENT_FAILED':
       return Colors.red.shade50;
     case 'PAYMENT_SUCCEEDED':
       return Colors.green.shade50;
+    case 'DELIVERED':
+      return Colors.teal.shade50;
+    case 'COMPLETED':
+      return Colors.teal.shade50;
     case 'CANCELLED':
       return Colors.red.shade50;
     case 'DONE':
@@ -28,12 +37,22 @@ Color getStatusTextColor(String status) {
   switch (status.toUpperCase()) {
     case 'NEW':
       return Colors.orange.shade700;
+    case 'WAITING':
+      return Colors.amber.shade700;
+    case 'CONFIRMED':
+      return Colors.indigo.shade700;
     case 'PAYMENT_CREATED':
       return Colors.blue.shade700;
+    case 'PAYMENT_PENDING':
+      return Colors.cyan.shade700;
     case 'PAYMENT_FAILED':
       return Colors.red.shade700;
     case 'PAYMENT_SUCCEEDED':
       return Colors.green.shade700;
+    case 'DELIVERED':
+      return Colors.teal.shade700;
+    case 'COMPLETED':
+      return Colors.teal.shade700;
     case 'CANCELLED':
       return Colors.red.shade700;
     case 'DONE':
@@ -49,12 +68,22 @@ String getStatusText(BuildContext context, String status) {
   switch (status.toUpperCase()) {
     case 'NEW':
       return context.tr(LocaleKeys.status_new);
+    case 'WAITING':
+      return context.tr(LocaleKeys.status_pending);
+    case 'CONFIRMED':
+      return context.tr(LocaleKeys.status_confirmed);
     case 'PAYMENT_CREATED':
       return context.tr(LocaleKeys.status_payment_created);
+    case 'PAYMENT_PENDING':
+      return context.tr(LocaleKeys.status_pending);
     case 'PAYMENT_FAILED':
       return context.tr(LocaleKeys.status_payment_failed);
     case 'PAYMENT_SUCCEEDED':
       return context.tr(LocaleKeys.status_payment_succeeded);
+    case 'DELIVERED':
+      return context.tr(LocaleKeys.status_delivered);
+    case 'COMPLETED':
+      return context.tr(LocaleKeys.status_done);
     case 'CANCELLED':
       return context.tr(LocaleKeys.status_cancelled);
     case 'DONE':

@@ -7,10 +7,6 @@ import 'package:intl/intl.dart';
 
 import '../../../../core/utils/locale_keys.g.dart';
 
-String _getProductDisplayName(OrderProductModel product) {
-  return "Product #${product.productId}";
-}
-
 void showOrderDetails(BuildContext context, dynamic order) {
   print("📦 Showing order details for ID: ${order.orderId}");
   print("🖼️ Products count: ${order.products.length}");
@@ -201,7 +197,7 @@ void showOrderDetails(BuildContext context, dynamic order) {
                                     ? 10
                                     : 0,
                               ),
-                              child: _buildProductCard(product),
+                              child: _buildProductCard(context, product),
                             );
                           }).toList(),
                         ],
@@ -345,7 +341,10 @@ Widget _buildInfoTile({
   );
 }
 
-Widget _buildProductCard(OrderProductModel product) {
+Widget _buildProductCard(BuildContext context, OrderProductModel product) {
+  final String langCode = context.locale.languageCode;
+  final String name = product.displayName(langCode);
+
   return Container(
     padding: const EdgeInsets.all(12),
     decoration: BoxDecoration(
@@ -374,7 +373,7 @@ Widget _buildProductCard(OrderProductModel product) {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                _getProductDisplayName(product),
+                name,
                 style: const TextStyle(
                   fontWeight: FontWeight.w600,
                   fontSize: 13,
@@ -384,6 +383,25 @@ Widget _buildProductCard(OrderProductModel product) {
               const SizedBox(height: 3),
               Row(
                 children: [
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 6,
+                      vertical: 2,
+                    ),
+                    decoration: BoxDecoration(
+                      color: Colors.grey.shade100,
+                      borderRadius: BorderRadius.circular(4),
+                    ),
+                    child: Text(
+                      "#${product.productId}",
+                      style: TextStyle(
+                        fontSize: 11,
+                        color: Colors.grey.shade500,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 6),
                   Container(
                     padding: const EdgeInsets.symmetric(
                       horizontal: 6,

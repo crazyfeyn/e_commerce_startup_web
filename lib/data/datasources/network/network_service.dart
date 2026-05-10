@@ -173,6 +173,7 @@ class NetworkService {
       "/api/v1/file/download?identity=$identity";
   static final String apiFetchOrders = "/api/v1/admin/order/get-all";
   static final String apiConfirmOrder = "/api/v1/order/confirm";
+  static final String apiEditOrderStatus = "/api/v1/admin/order/edit-status";
   static const String apiChat = '/api/chat';
 
   /* Http Params */

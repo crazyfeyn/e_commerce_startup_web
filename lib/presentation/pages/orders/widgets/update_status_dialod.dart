@@ -5,20 +5,25 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
+// All statuses supported by PUT /api/v1/admin/order/edit-status
+const _editableStatuses = [
+  'NEW',
+  'WAITING',
+  'CONFIRMED',
+  'PAYMENT_CREATED',
+  'PAYMENT_PENDING',
+  'PAYMENT_FAILED',
+  'PAYMENT_SUCCEEDED',
+  'DELIVERED',
+  'COMPLETED',
+  'CANCELLED',
+];
+
 void showUpdateStatusDialog(
   BuildContext context,
   dynamic order,
   OrdersViewmodel viewmodel,
 ) {
-  final statuses = [
-    'pending',
-    'confirmed',
-    'processing',
-    'shipped',
-    'delivered',
-    'cancelled',
-  ];
-
   String selectedStatus = order.orderStatus;
 
   showDialog(
@@ -26,6 +31,8 @@ void showUpdateStatusDialog(
     builder: (BuildContext context) {
       return StatefulBuilder(
         builder: (context, setState) {
+          final bool isUpdating = viewmodel.isOrderEditing(order.orderId);
+
           return Dialog(
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(20),
@@ -78,7 +85,9 @@ void showUpdateStatusDialog(
                           ),
                         ),
                         IconButton(
-                          onPressed: () => Navigator.of(context).pop(),
+                          onPressed: isUpdating
+                              ? null
+                              : () => Navigator.of(context).pop(),
                           icon: const Icon(
                             CupertinoIcons.xmark,
                             size: 16,
@@ -112,7 +121,7 @@ void showUpdateStatusDialog(
                           ),
                         ),
                         const SizedBox(height: 12),
-                        ...statuses.map((status) {
+                        ..._editableStatuses.map((status) {
                           final bool isSelected = selectedStatus == status;
                           final Color statusColor = getStatusTextColor(status);
                           final Color statusBgColor = getStatusColor(status);
@@ -120,9 +129,11 @@ void showUpdateStatusDialog(
                           return Padding(
                             padding: const EdgeInsets.only(bottom: 8),
                             child: InkWell(
-                              onTap: () {
-                                setState(() => selectedStatus = status);
-                              },
+                              onTap: isUpdating
+                                  ? null
+                                  : () {
+                                      setState(() => selectedStatus = status);
+                                    },
                               borderRadius: BorderRadius.circular(10),
                               child: AnimatedContainer(
                                 duration: const Duration(milliseconds: 150),
@@ -197,7 +208,7 @@ void showUpdateStatusDialog(
                               ),
                             ),
                           );
-                        }).toList(),
+                        }),
                       ],
                     ),
                   ),
@@ -213,7 +224,9 @@ void showUpdateStatusDialog(
                       children: [
                         Expanded(
                           child: OutlinedButton(
-                            onPressed: () => Navigator.of(context).pop(),
+                            onPressed: isUpdating
+                                ? null
+                                : () => Navigator.of(context).pop(),
                             style: OutlinedButton.styleFrom(
                               padding: const EdgeInsets.symmetric(vertical: 12),
                               side: const BorderSide(color: Color(0xFFD1D5DB)),
@@ -233,35 +246,51 @@ void showUpdateStatusDialog(
                         const SizedBox(width: 10),
                         Expanded(
                           child: FilledButton(
-                            onPressed: selectedStatus != order.orderStatus
-                                ? () {
-                                    Navigator.of(context).pop();
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      SnackBar(
-                                        content: Row(
-                                          children: [
-                                            const Icon(
-                                              CupertinoIcons
-                                                  .check_mark_circled_solid,
-                                              color: Colors.white,
-                                              size: 16,
+                            onPressed:
+                                !isUpdating &&
+                                    selectedStatus != order.orderStatus
+                                ? () async {
+                                    // Trigger rebuild to reflect isUpdating state
+                                    setState(() {});
+                                    final success =
+                                        await viewmodel.editOrderStatus(
+                                          order.orderId,
+                                          selectedStatus,
+                                        );
+                                    if (context.mounted) {
+                                      Navigator.of(context).pop();
+                                      if (success) {
+                                        ScaffoldMessenger.of(
+                                          context,
+                                        ).showSnackBar(
+                                          SnackBar(
+                                            content: Row(
+                                              children: [
+                                                const Icon(
+                                                  CupertinoIcons
+                                                      .check_mark_circled_solid,
+                                                  color: Colors.white,
+                                                  size: 16,
+                                                ),
+                                                const SizedBox(width: 8),
+                                                Text(
+                                                  "${context.tr(LocaleKeys.order_status_updated)} #${order.orderId}",
+                                                ),
+                                              ],
                                             ),
-                                            const SizedBox(width: 8),
-                                            Text(
-                                              "${context.tr(LocaleKeys.order_status_updated)} #${order.orderId}",
+                                            backgroundColor:
+                                                Colors.green.shade600,
+                                            behavior: SnackBarBehavior.floating,
+                                            shape: RoundedRectangleBorder(
+                                              borderRadius: BorderRadius.circular(
+                                                10,
+                                              ),
                                             ),
-                                          ],
-                                        ),
-                                        backgroundColor: Colors.green.shade600,
-                                        behavior: SnackBarBehavior.floating,
-                                        shape: RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.circular(
-                                            10,
+                                            margin: const EdgeInsets.all(16),
                                           ),
-                                        ),
-                                        margin: const EdgeInsets.all(16),
-                                      ),
-                                    );
+                                        );
+                                      }
+                                    }
                                   }
                                 : null,
                             style: FilledButton.styleFrom(
@@ -272,15 +301,24 @@ void showUpdateStatusDialog(
                                 borderRadius: BorderRadius.circular(10),
                               ),
                             ),
-                            child: Text(
-                              context.tr(LocaleKeys.update),
-                              style: TextStyle(
-                                fontWeight: FontWeight.w600,
-                                color: selectedStatus != order.orderStatus
-                                    ? Colors.white
-                                    : Colors.grey.shade400,
-                              ),
-                            ),
+                            child: isUpdating
+                                ? SizedBox(
+                                    height: 16,
+                                    width: 16,
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2,
+                                      color: Colors.grey.shade400,
+                                    ),
+                                  )
+                                : Text(
+                                    context.tr(LocaleKeys.update),
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.w600,
+                                      color: selectedStatus != order.orderStatus
+                                          ? Colors.white
+                                          : Colors.grey.shade400,
+                                    ),
+                                  ),
                           ),
                         ),
                       ],
