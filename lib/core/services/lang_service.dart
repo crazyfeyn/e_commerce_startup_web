@@ -19,12 +19,15 @@ class LangService {
   // Needs to be same orders with languages
   static final supportedLocales = [
     const Locale("ko", "KR"),
-    // const Locale("en", "US"),
+    const Locale("en", "US"),
   ];
 
   // Gets locale from language, and updates the locale
   static void changeLocale(BuildContext context, String langCode) {
-    final result = supportedLocales.firstWhere((e) => e.languageCode == langCode, orElse: () => supportedLocales.first);
+    final result = supportedLocales.firstWhere(
+      (e) => e.languageCode == langCode,
+      orElse: () => supportedLocales.first,
+    );
     context.setLocale(result);
     DBService.setLanguage(result.toStringWithSeparator(separator: "-"));
   }
@@ -44,29 +47,37 @@ class LangService {
   }
 
   static List<LanguageModel> getLanguages() {
-    return supportedLocales.map(
+    return supportedLocales
+        .map(
           (e) => LanguageModel(
             name: langName(e.languageCode),
             icon: langIcon(e.languageCode),
             languageCode: e.languageCode,
             countryCode: e.countryCode,
           ),
-        ).toList();
+        )
+        .toList();
   }
 
   static String langName(String languageCode) {
     switch (languageCode) {
-      case 'ko': return LocaleKeys.lang_ko.tr();
-      case 'en': return LocaleKeys.lang_en.tr();
-      default: throw "Exception: Not found";
+      case 'ko':
+        return LocaleKeys.lang_ko.tr();
+      case 'en':
+        return LocaleKeys.lang_en.tr();
+      default:
+        throw "Exception: Not found";
     }
   }
 
   static String langIcon(String languageCode) {
     switch (languageCode) {
-      case 'ko': return AppAssets.icons.flagKo;
-      case 'en': return AppAssets.icons.flagUs;
-      default: throw "Exception: Not found";
+      case 'ko':
+        return AppAssets.icons.flagKo;
+      case 'en':
+        return AppAssets.icons.flagUs;
+      default:
+        throw "Exception: Not found";
     }
   }
 }
