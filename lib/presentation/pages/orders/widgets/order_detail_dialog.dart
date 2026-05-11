@@ -333,7 +333,7 @@ Widget _buildInfoTile({
 }
 
 Widget _buildProductCard(BuildContext context, OrderProductModel product) {
-  final String name = product.title ?? '#${product.productId}';
+  final String name = product.displayName("en");
 
   return Container(
     padding: const EdgeInsets.all(12),
