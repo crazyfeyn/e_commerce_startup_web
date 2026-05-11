@@ -1,3 +1,4 @@
+import 'package:e_commerce_startup_web/core/services/lang_service.dart';
 import 'package:e_commerce_startup_web/data/models/order_product_model.dart';
 import 'package:e_commerce_startup_web/presentation/pages/orders/widgets/order_helpers.dart';
 import 'package:easy_localization/easy_localization.dart';
@@ -342,8 +343,7 @@ Widget _buildInfoTile({
 }
 
 Widget _buildProductCard(BuildContext context, OrderProductModel product) {
-  final String langCode = context.locale.languageCode;
-  final String name = product.displayName(langCode);
+  final String name = product.displayName(LangService.currentBackendLanguageKey);
 
   return Container(
     padding: const EdgeInsets.all(12),

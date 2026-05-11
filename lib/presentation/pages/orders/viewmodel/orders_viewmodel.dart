@@ -12,6 +12,7 @@ class OrdersViewmodel extends ChangeNotifier {
 
   FormzSubmissionStatus formzStatus = FormzSubmissionStatus.inProgress;
   List<OrderModel> orders = [];
+  String? lastError;
   final Set<int> _confirmingOrders = {};
   final Set<int> _editingOrders = {};
 
@@ -25,8 +26,12 @@ class OrdersViewmodel extends ChangeNotifier {
     }
     final result = await _repository.fetchOrders();
     result.fold(
-      (_) => formzStatus = FormzSubmissionStatus.failure,
+      (error) {
+        lastError = error;
+        formzStatus = FormzSubmissionStatus.failure;
+      },
       (data) {
+        lastError = null;
         orders = data;
         formzStatus = FormzSubmissionStatus.success;
       },

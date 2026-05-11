@@ -37,6 +37,12 @@ class LangService {
     return localeLang;
   }
 
+  /// Flutter locale language code (e.g. "ko", "en") — pass directly to
+  /// OrderProductModel.displayName() or TitleData.getLocalized().
+  static String get currentBackendLanguageKey {
+    return currentLocale.split('-').first;
+  }
+
   static List<LanguageModel> getLanguages() {
     return supportedLocales.map(
           (e) => LanguageModel(

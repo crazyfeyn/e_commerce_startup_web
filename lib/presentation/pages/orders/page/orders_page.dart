@@ -1,3 +1,4 @@
+import 'package:e_commerce_startup_web/core/services/lang_service.dart';
 import 'package:e_commerce_startup_web/core/utils/app_enums.dart';
 import 'package:e_commerce_startup_web/core/utils/app_snackbar.dart';
 import 'package:e_commerce_startup_web/core/utils/locale_keys.g.dart';
@@ -99,6 +100,8 @@ class OrdersPage extends StatelessWidget {
           appBar: _buildAppBar(context, viewmodel),
           body: viewmodel.formzStatus.isInProgress
               ? _buildLoading()
+              : viewmodel.formzStatus.isFailure
+              ? _buildError(context, viewmodel.lastError, viewmodel)
               : viewmodel.orders.isEmpty
               ? _buildEmpty(context)
               : _buildTable(context, viewmodel),
@@ -220,6 +223,69 @@ class OrdersPage extends StatelessWidget {
           Text(
             'New orders will appear here once received.',
             style: TextStyle(fontSize: 14, color: Colors.grey.shade500),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildError(
+    BuildContext context,
+    String? error,
+    OrdersViewmodel viewmodel,
+  ) {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Container(
+            width: 96,
+            height: 96,
+            decoration: BoxDecoration(
+              color: Colors.red.shade50,
+              borderRadius: BorderRadius.circular(24),
+            ),
+            child: Icon(
+              CupertinoIcons.exclamationmark_circle,
+              size: 44,
+              color: Colors.red.shade400,
+            ),
+          ),
+          const SizedBox(height: 20),
+          const Text(
+            'Failed to load orders',
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.w600,
+              color: Color(0xFF111827),
+            ),
+          ),
+          if (error != null && error.isNotEmpty) ...[
+            const SizedBox(height: 8),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 40),
+              child: Text(
+                error,
+                textAlign: TextAlign.center,
+                style: TextStyle(fontSize: 13, color: Colors.grey.shade500),
+              ),
+            ),
+          ],
+          const SizedBox(height: 24),
+          FilledButton.icon(
+            onPressed: () => viewmodel.fetchOrders(),
+            icon: const Icon(CupertinoIcons.arrow_clockwise, size: 15),
+            label: const Text('Retry'),
+            style: FilledButton.styleFrom(
+              backgroundColor: const Color(0xFF4F46E5),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
+              padding: const EdgeInsets.symmetric(
+                horizontal: 20,
+                vertical: 12,
+              ),
+            ),
           ),
         ],
       ),
@@ -643,7 +709,7 @@ class OrdersPage extends StatelessWidget {
           ),
           Expanded(
             child: Text(
-              "Product #${product.productId}",
+              product.displayName(LangService.currentBackendLanguageKey),
               style: const TextStyle(fontSize: 10, color: Color(0xFF6B7280)),
               overflow: TextOverflow.ellipsis,
             ),

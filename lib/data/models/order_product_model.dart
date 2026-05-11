@@ -39,7 +39,9 @@ class OrderProductModel {
       currency: json['currency'] ?? '',
       amount: json['amount'] ?? 0,
       measurementId: json['measurementId'] ?? 0,
-      title: json['title'] as String?,
+      title:
+          json['productTitle'] as String? ??
+          json['title'] as String?, // ← updated
       titleData: json['titleData'] != null
           ? TitleData.fromMap(json['titleData'] as Map<String, dynamic>)
           : null,
