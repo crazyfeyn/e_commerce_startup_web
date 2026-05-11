@@ -1,20 +1,16 @@
-import 'package:e_commerce_startup_web/core/services/lang_service.dart';
 import 'package:e_commerce_startup_web/core/utils/app_enums.dart';
 import 'package:e_commerce_startup_web/core/utils/app_snackbar.dart';
-import 'package:e_commerce_startup_web/core/utils/locale_keys.g.dart';
 import 'package:e_commerce_startup_web/data/models/order_model.dart';
 import 'package:e_commerce_startup_web/data/models/order_product_model.dart';
 import 'package:e_commerce_startup_web/presentation/pages/orders/viewmodel/orders_viewmodel.dart';
 import 'package:e_commerce_startup_web/presentation/pages/orders/widgets/order_detail_dialog.dart';
 import 'package:e_commerce_startup_web/presentation/pages/orders/widgets/order_helpers.dart';
 import 'package:e_commerce_startup_web/presentation/pages/orders/widgets/update_status_dialod.dart';
-import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
-// Flex weights for 7 columns: ID | Customer | Products | Price | Status | Date | Actions
 const List<int> _flex = [1, 2, 2, 1, 2, 2, 2];
 
 class OrdersPage extends StatelessWidget {
@@ -49,24 +45,18 @@ class OrdersPage extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(width: 12),
-                Expanded(
-                  child: Text(
-                    ctx.tr(LocaleKeys.confirm_order),
-                    style: const TextStyle(fontSize: 18),
-                  ),
+                const Expanded(
+                  child: Text('Confirm Order', style: TextStyle(fontSize: 18)),
                 ),
               ],
             ),
             content: Text(
-              ctx.tr(
-                LocaleKeys.confirm_order_message,
-                args: ['${order.orderId}'],
-              ),
+              'Are you sure you want to confirm order #${order.orderId}?',
             ),
             actions: [
               TextButton(
                 onPressed: () => Navigator.of(ctx).pop(false),
-                child: Text(ctx.tr(LocaleKeys.cancel)),
+                child: const Text('Cancel'),
               ),
               FilledButton(
                 onPressed: () => Navigator.of(ctx).pop(true),
@@ -76,7 +66,7 @@ class OrdersPage extends StatelessWidget {
                     borderRadius: BorderRadius.circular(8),
                   ),
                 ),
-                child: Text(ctx.tr(LocaleKeys.confirm)),
+                child: const Text('Confirm'),
               ),
             ],
           ),
@@ -86,7 +76,7 @@ class OrdersPage extends StatelessWidget {
     if (!shouldConfirm) return;
     final success = await viewmodel.confirmOrder(order.orderId);
     if (success) {
-      GlobalSnackBar.showSuccess(context.tr(LocaleKeys.confirm_order_success));
+      GlobalSnackBar.showSuccess('Order confirmed successfully');
     }
   }
 
@@ -103,7 +93,7 @@ class OrdersPage extends StatelessWidget {
               : viewmodel.formzStatus.isFailure
               ? _buildError(context, viewmodel.lastError, viewmodel)
               : viewmodel.orders.isEmpty
-              ? _buildEmpty(context)
+              ? _buildEmpty()
               : _buildTable(context, viewmodel),
         ),
       ),
@@ -137,9 +127,9 @@ class OrdersPage extends StatelessWidget {
             ),
           ),
           const SizedBox(width: 12),
-          Text(
-            context.tr(LocaleKeys.menu_orders),
-            style: const TextStyle(
+          const Text(
+            'Orders',
+            style: TextStyle(
               fontWeight: FontWeight.w700,
               fontSize: 18,
               color: Color(0xFF111827),
@@ -192,7 +182,7 @@ class OrdersPage extends StatelessWidget {
     );
   }
 
-  Widget _buildEmpty(BuildContext context) {
+  Widget _buildEmpty() {
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -211,9 +201,9 @@ class OrdersPage extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 20),
-          Text(
-            context.tr(LocaleKeys.no_orders_found),
-            style: const TextStyle(
+          const Text(
+            'No orders found',
+            style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.w600,
               color: Color(0xFF111827),
@@ -281,18 +271,13 @@ class OrdersPage extends StatelessWidget {
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(10),
               ),
-              padding: const EdgeInsets.symmetric(
-                horizontal: 20,
-                vertical: 12,
-              ),
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
             ),
           ),
         ],
       ),
     );
   }
-
-  // ─── Table ────────────────────────────────────────────────────────────────
 
   Widget _buildTable(BuildContext context, OrdersViewmodel viewmodel) {
     return Padding(
@@ -314,7 +299,7 @@ class OrdersPage extends StatelessWidget {
           borderRadius: BorderRadius.circular(16),
           child: Column(
             children: [
-              _buildHeaderRow(context),
+              _buildHeaderRow(),
               Expanded(
                 child: ListView.builder(
                   itemCount: viewmodel.orders.length,
@@ -329,15 +314,15 @@ class OrdersPage extends StatelessWidget {
     );
   }
 
-  Widget _buildHeaderRow(BuildContext context) {
-    final labels = [
-      context.tr(LocaleKeys.order_id),
-      context.tr(LocaleKeys.customer_info),
-      context.tr(LocaleKeys.products),
-      context.tr(LocaleKeys.total_price),
-      context.tr(LocaleKeys.order_status),
-      context.tr(LocaleKeys.order_date),
-      context.tr(LocaleKeys.actions),
+  Widget _buildHeaderRow() {
+    const labels = [
+      'ID',
+      'Customer',
+      'Products',
+      'Total Price',
+      'Status',
+      'Date',
+      'Actions',
     ];
 
     return Container(
@@ -391,7 +376,7 @@ class OrdersPage extends StatelessWidget {
       ),
       child: Row(
         children: [
-          // ── 1. Order ID ──────────────────────────────────────────────────
+          // 1. Order ID
           Expanded(
             flex: _flex[0],
             child: Padding(
@@ -421,7 +406,7 @@ class OrdersPage extends StatelessWidget {
             ),
           ),
 
-          // ── 2. Customer ───────────────────────────────────────────────────
+          // 2. Customer
           Expanded(
             flex: _flex[1],
             child: Padding(
@@ -487,7 +472,7 @@ class OrdersPage extends StatelessWidget {
             ),
           ),
 
-          // ── 3. Products ───────────────────────────────────────────────────
+          // 3. Products
           Expanded(
             flex: _flex[2],
             child: Padding(
@@ -533,7 +518,7 @@ class OrdersPage extends StatelessWidget {
             ),
           ),
 
-          // ── 4. Price ──────────────────────────────────────────────────────
+          // 4. Price
           Expanded(
             flex: _flex[3],
             child: Padding(
@@ -575,19 +560,19 @@ class OrdersPage extends StatelessWidget {
             ),
           ),
 
-          // ── 5. Status ─────────────────────────────────────────────────────
+          // 5. Status
           Expanded(
             flex: _flex[4],
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 12),
               child: Align(
                 alignment: Alignment.centerLeft,
-                child: _statusBadge(context, order.orderStatus),
+                child: _statusBadge(order.orderStatus),
               ),
             ),
           ),
 
-          // ── 6. Date ───────────────────────────────────────────────────────
+          // 6. Date
           Expanded(
             flex: _flex[5],
             child: Padding(
@@ -628,7 +613,7 @@ class OrdersPage extends StatelessWidget {
             ),
           ),
 
-          // ── 7. Actions ────────────────────────────────────────────────────
+          // 7. Actions
           Expanded(
             flex: _flex[6],
             child: Padding(
@@ -656,7 +641,7 @@ class OrdersPage extends StatelessWidget {
                               color: Colors.white,
                             ),
                       bg: Colors.green.shade500,
-                      tip: context.tr(LocaleKeys.confirm_order),
+                      tip: 'Confirm Order',
                     ),
                     const SizedBox(width: 6),
                   ],
@@ -668,7 +653,7 @@ class OrdersPage extends StatelessWidget {
                       color: Color(0xFF4F46E5),
                     ),
                     bg: const Color(0xFFEEF2FF),
-                    tip: context.tr(LocaleKeys.view_details),
+                    tip: 'View Details',
                   ),
                   const SizedBox(width: 6),
                   _actionBtn(
@@ -680,7 +665,7 @@ class OrdersPage extends StatelessWidget {
                       color: Colors.orange.shade600,
                     ),
                     bg: Colors.orange.shade50,
-                    tip: context.tr(LocaleKeys.update_status),
+                    tip: 'Update Status',
                   ),
                 ],
               ),
@@ -690,8 +675,6 @@ class OrdersPage extends StatelessWidget {
       ),
     );
   }
-
-  // ─── Helpers ──────────────────────────────────────────────────────────────
 
   Widget _productLine(OrderProductModel product) {
     return Padding(
@@ -709,7 +692,7 @@ class OrdersPage extends StatelessWidget {
           ),
           Expanded(
             child: Text(
-              product.displayName(LangService.currentBackendLanguageKey),
+              product.displayName("en"),
               style: const TextStyle(fontSize: 10, color: Color(0xFF6B7280)),
               overflow: TextOverflow.ellipsis,
             ),
@@ -719,7 +702,7 @@ class OrdersPage extends StatelessWidget {
     );
   }
 
-  Widget _statusBadge(BuildContext context, String status) {
+  Widget _statusBadge(String status) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
       decoration: BoxDecoration(
@@ -740,7 +723,7 @@ class OrdersPage extends StatelessWidget {
           const SizedBox(width: 5),
           Flexible(
             child: Text(
-              getStatusText(context, status),
+              getStatusText(status),
               style: TextStyle(
                 fontSize: 11,
                 fontWeight: FontWeight.w600,

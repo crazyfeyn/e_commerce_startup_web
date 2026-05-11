@@ -1,9 +1,7 @@
 import 'package:e_commerce_startup_web/config/router/app_router.dart';
 import 'package:e_commerce_startup_web/config/theme/app_theme.dart';
-import 'package:e_commerce_startup_web/core/services/lang_service.dart';
 import 'package:e_commerce_startup_web/core/utils/app_snackbar.dart';
 import 'package:e_commerce_startup_web/data/datasources/database/db_service.dart';
-import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 
 String _maskToken(String? token) {
@@ -16,11 +14,8 @@ String _maskToken(String? token) {
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-
-  await EasyLocalization.ensureInitialized();
   await DBService.ensure.ensureInitialized();
 
-  // Debug: verify what SharedPreferences currently stores.
   final accessToken = DBService.ensure.getAccessToken();
   final refreshToken = DBService.ensure.getRefreshToken();
   final clientId = DBService.ensure.getClientId();
@@ -34,15 +29,7 @@ void main() async {
     '[DBService] init: clientId=${clientId.isEmpty ? "(empty)" : clientId}',
   );
 
-  runApp(
-    EasyLocalization(
-      path: LangService.path,
-      startLocale: LangService.fallbackLocale,
-      fallbackLocale: LangService.fallbackLocale,
-      supportedLocales: LangService.supportedLocales,
-      child: MyApp(),
-    ),
-  );
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
@@ -58,9 +45,6 @@ class MyApp extends StatelessWidget {
         debugShowCheckedModeBanner: false,
         routerConfig: AppRouter.router,
         theme: AppTheme.appTheme,
-        locale: context.locale,
-        supportedLocales: context.supportedLocales,
-        localizationsDelegates: context.localizationDelegates,
         scaffoldMessengerKey: GlobalSnackBar.scaffoldMessengerKey,
         builder: (context, child) {
           return MediaQuery(

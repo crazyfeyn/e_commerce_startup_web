@@ -1,10 +1,7 @@
 import 'package:dio/dio.dart';
-import 'package:e_commerce_startup_web/core/services/lang_service.dart';
 import 'package:e_commerce_startup_web/core/utils/jwt_utils.dart';
-import 'package:e_commerce_startup_web/core/utils/locale_keys.g.dart';
 import 'package:e_commerce_startup_web/data/datasources/database/db_service.dart';
 import 'package:e_commerce_startup_web/data/repositories/login_repository_impl.dart';
-import 'package:easy_localization/easy_localization.dart';
 import 'package:uuid/uuid.dart';
 
 class QueueItem {
@@ -28,7 +25,7 @@ class NetworkInterceptor extends Interceptor {
 
   @override
   void onRequest(RequestOptions options, RequestInterceptorHandler handler) {
-    final langCode = LangService.currentLocale;
+    // final langCode = LangService.currentLocale;
     final accessToken = DBService.ensure.getAccessToken();
 
     if (accessToken.isNotEmpty) {
@@ -37,7 +34,7 @@ class NetworkInterceptor extends Interceptor {
 
     // Add required headers from Swagger
     options.headers["X-Request-UUID"] = Uuid().v4();
-    options.headers["X-Client-Lang"] = langCode;
+    options.headers["X-Client-Lang"] = "en-US";
     options.headers["X-Device-Type"] = "Web"; // Added this required header
 
     handler.next(options);
@@ -148,7 +145,7 @@ class NetworkInterceptor extends Interceptor {
       headers: {
         'Authorization': 'Bearer $newToken',
         'X-Request-UUID': Uuid().v4(),
-        'X-Client-Lang': LangService.currentLocale,
+        'X-Client-Lang': "en-US",
         'X-Device-Type': 'Web', // This is CRITICAL for admin endpoints
       },
       extra: {...original.extra, 'retried': true},
@@ -179,13 +176,10 @@ class NetworkException implements Exception {
       case DioExceptionType.connectionTimeout:
       case DioExceptionType.sendTimeout:
       case DioExceptionType.receiveTimeout:
-        return NetworkException(
-          LocaleKeys.timeout_message.tr(),
-          NetworkExceptionType.timeout,
-        );
+        return NetworkException("Timeout", NetworkExceptionType.timeout);
       case DioExceptionType.connectionError:
         return NetworkException(
-          LocaleKeys.check_internet_connection.tr(),
+          "Check internet connection",
           NetworkExceptionType.noInternet,
         );
       case DioExceptionType.badResponse:
@@ -198,7 +192,7 @@ class NetworkException implements Exception {
         );
       case DioExceptionType.badCertificate:
         return NetworkException(
-          LocaleKeys.bad_certificate_message.tr(),
+          "Bad certificate",
           NetworkExceptionType.badCertificate,
         );
       case DioExceptionType.cancel:
@@ -208,7 +202,7 @@ class NetworkException implements Exception {
         );
       default:
         return NetworkException(
-          LocaleKeys.dio_unknown_message.tr(args: [e.message ?? ""]),
+          "Unknown error: ${e.message ?? ""}",
           NetworkExceptionType.unknown,
         );
     }

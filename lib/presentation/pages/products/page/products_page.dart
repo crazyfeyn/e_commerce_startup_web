@@ -1,12 +1,10 @@
 import 'package:e_commerce_startup_web/core/utils/app_colors.dart';
 import 'package:e_commerce_startup_web/core/utils/app_enums.dart';
 import 'package:e_commerce_startup_web/core/utils/app_styles.dart';
-import 'package:e_commerce_startup_web/core/utils/locale_keys.g.dart';
 import 'package:e_commerce_startup_web/data/datasources/network/network_service.dart';
 import 'package:e_commerce_startup_web/presentation/pages/products/viewmodel/products_viewmodel.dart';
 import 'package:e_commerce_startup_web/presentation/pages/products/widget/product_dialog.dart';
 import 'package:e_commerce_startup_web/presentation/widgets/network_image_loader.dart';
-import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -65,7 +63,7 @@ class ProductsPage extends StatelessWidget {
           ),
           const SizedBox(width: 12),
           Text(
-            context.tr(LocaleKeys.menu_products),
+            'Products',
             style: const TextStyle(
               fontWeight: FontWeight.w700,
               fontSize: 18,
@@ -139,7 +137,7 @@ class ProductsPage extends StatelessWidget {
           ),
           const SizedBox(height: 20),
           Text(
-            context.tr(LocaleKeys.menu_products),
+            'Products',
             style: const TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.w600,
@@ -277,8 +275,7 @@ class ProductsPage extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    product.titleData?.getTitle(context.locale.languageCode) ??
-                        'No name',
+                    product.titleData?.en ?? 'No name',
                     style: const TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.w700,
@@ -340,7 +337,7 @@ class ProductsPage extends StatelessWidget {
       elevation: 2,
       icon: const Icon(Icons.add, size: 20),
       label: Text(
-        context.tr(LocaleKeys.add_product),
+        'Add product',
         style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13),
       ),
     );
@@ -385,7 +382,7 @@ class ProductsPage extends StatelessWidget {
                     const SizedBox(width: 14),
                     Expanded(
                       child: Text(
-                        ctx.tr(LocaleKeys.delete_product),
+                        'Delete product',
                         style: const TextStyle(
                           fontWeight: FontWeight.w700,
                           fontSize: 16,
@@ -399,7 +396,7 @@ class ProductsPage extends StatelessWidget {
               Padding(
                 padding: const EdgeInsets.all(20),
                 child: Text(
-                  ctx.tr(LocaleKeys.are_you_sure_delete_product),
+                  'Are you sure you want to delete this product?',
                   style: TextStyle(
                     fontSize: 14,
                     color: Colors.grey.shade600,
@@ -422,7 +419,7 @@ class ProductsPage extends StatelessWidget {
                           ),
                         ),
                         child: Text(
-                          ctx.tr(LocaleKeys.cancel),
+                          'Cancel',
                           style: const TextStyle(
                             color: Color(0xFF374151),
                             fontWeight: FontWeight.w500,
@@ -445,7 +442,7 @@ class ProductsPage extends StatelessWidget {
                           ),
                         ),
                         child: Text(
-                          ctx.tr(LocaleKeys.delete),
+                          'Delete',
                           style: const TextStyle(fontWeight: FontWeight.w600),
                         ),
                       ),

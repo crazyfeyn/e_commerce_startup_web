@@ -1,12 +1,10 @@
 import 'package:dartz/dartz.dart';
 import 'package:e_commerce_startup_web/core/utils/app_snackbar.dart';
-import 'package:e_commerce_startup_web/core/utils/locale_keys.g.dart';
 import 'package:e_commerce_startup_web/data/datasources/network/cancel_token_manager.dart';
 import 'package:e_commerce_startup_web/data/datasources/network/network_helper.dart';
 import 'package:e_commerce_startup_web/data/datasources/network/network_service.dart';
 import 'package:e_commerce_startup_web/data/models/order_model.dart';
 import 'package:e_commerce_startup_web/domain/repositories/orders_repository.dart';
-import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/cupertino.dart';
 
 class OrdersRepositoryImpl extends OrdersRepository {
@@ -102,7 +100,7 @@ class OrdersRepositoryImpl extends OrdersRepository {
       } else {
         final message =
             response?["error"]?["message"] ??
-            LocaleKeys.confirm_order_failed.tr();
+            "Failed to confirm order. Please try again.";
 
         debugPrint("❌ Failed Message: $message");
         debugPrint("===================================");
@@ -153,7 +151,7 @@ class OrdersRepositoryImpl extends OrdersRepository {
       } else {
         final message =
             response?['error']?['message'] ??
-            LocaleKeys.confirm_order_failed.tr();
+            "Failed to confirm order. Please try again.";
         GlobalSnackBar.showError(message);
         return Left(message);
       }

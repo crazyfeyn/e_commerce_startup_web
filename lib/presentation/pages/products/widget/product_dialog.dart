@@ -1,7 +1,6 @@
 import 'package:e_commerce_startup_web/config/router/navigation_service.dart';
 import 'package:e_commerce_startup_web/core/utils/app_colors.dart';
 import 'package:e_commerce_startup_web/core/utils/app_styles.dart';
-import 'package:e_commerce_startup_web/core/utils/locale_keys.g.dart';
 import 'package:e_commerce_startup_web/data/datasources/network/network_service.dart';
 import 'package:e_commerce_startup_web/data/models/category_model.dart'
     hide TitleData;
@@ -14,7 +13,6 @@ import 'package:e_commerce_startup_web/presentation/widgets/custom_drop_down_men
 import 'package:e_commerce_startup_web/presentation/widgets/custom_elevated_button.dart';
 import 'package:e_commerce_startup_web/presentation/widgets/custom_text_field.dart';
 import 'package:e_commerce_startup_web/presentation/widgets/network_image_loader.dart';
-import 'package:easy_localization/easy_localization.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -128,19 +126,19 @@ class _ProductDialogState extends State<ProductDialog> {
   bool _validateDropdowns() {
     bool isValid = true;
     if (selectCategory == null) {
-      categoryError = context.tr(LocaleKeys.empty_filed);
+      categoryError = 'This field is required';
       isValid = false;
     } else {
       categoryError = null;
     }
     if (selectMeasurement == null) {
-      measurementError = context.tr(LocaleKeys.empty_filed);
+      measurementError = 'This field is required';
       isValid = false;
     } else {
       measurementError = null;
     }
     if (widget.product == null && newImages.isEmpty) {
-      fileError = context.tr(LocaleKeys.please_select_image);
+      fileError = 'Please select at least one image';
       isValid = false;
     } else {
       fileError = null;
@@ -167,14 +165,7 @@ class _ProductDialogState extends State<ProductDialog> {
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              context.tr(
-                LocaleKeys.error_selecting_files,
-                namedArgs: {'error': e.toString()},
-              ),
-            ),
-          ),
+          SnackBar(content: Text("Error selecting files: ${e.toString()}")),
         );
       }
     }
@@ -237,9 +228,7 @@ class _ProductDialogState extends State<ProductDialog> {
                           ),
                         ),
                         Text(
-                          isEdit
-                              ? context.tr(LocaleKeys.edit_product)
-                              : context.tr(LocaleKeys.add_product),
+                          isEdit ? 'Edit product' : 'Add product',
                           style: const TextStyle(
                             color: Colors.white,
                             fontSize: 18,
@@ -288,8 +277,8 @@ class _ProductDialogState extends State<ProductDialog> {
                       CustomDropDownMenu(
                         isSearch: true,
                         isLoadingFetch: isLoadingCat,
-                        title: context.tr(LocaleKeys.product_category_title),
-                        hint: context.tr(LocaleKeys.product_category_title),
+                        title: 'Category',
+                        hint: 'Category',
                         id: categories.isNotEmpty
                             ? selectCategory?.toString()
                             : null,
@@ -297,10 +286,7 @@ class _ProductDialogState extends State<ProductDialog> {
                             .map(
                               (e) => DropDownItem(
                                 e.id?.toString() ?? "",
-                                e.titleData?.getTitle(
-                                      context.locale.languageCode,
-                                    ) ??
-                                    "",
+                                e.titleData?.en ?? "",
                               ),
                             )
                             .toList(),
@@ -315,10 +301,10 @@ class _ProductDialogState extends State<ProductDialog> {
                       const SizedBox(height: 12),
                       CustomTextField(
                         ctr: _brandCtr,
-                        title: context.tr(LocaleKeys.product_brand_title),
-                        hintText: context.tr(LocaleKeys.product_brand_hint),
+                        title: 'Brand',
+                        hintText: 'Brand',
                         validator: (v) => (v == null || v.isEmpty)
-                            ? context.tr(LocaleKeys.empty_filed)
+                            ? 'This field is required'
                             : null,
                       ),
                       const SizedBox(height: 12),
@@ -328,22 +314,20 @@ class _ProductDialogState extends State<ProductDialog> {
                             child: CustomTextField(
                               ctr: _priceCtr,
                               keyboardType: TextInputType.number,
-                              title: context.tr(LocaleKeys.product_price_title),
-                              hintText: context.tr(
-                                LocaleKeys.product_price_hint,
-                              ),
+                              title: 'Price',
+                              hintText: "Price",
                               inputFormatters: [
                                 FilteringTextInputFormatter.allow(
                                   RegExp(r'^\d*\.?\d*'),
                                 ),
                               ],
                               validator: (v) {
-                                if (v == null || v.isEmpty)
-                                  return context.tr(LocaleKeys.empty_filed);
-                                if (double.tryParse(v) == null)
-                                  return context.tr(
-                                    LocaleKeys.please_enter_valid_number,
-                                  );
+                                if (v == null || v.isEmpty) {
+                                  return 'This field is required';
+                                }
+                                if (double.tryParse(v) == null) {
+                                  return "Please enter a valid number";
+                                }
                                 return null;
                               },
                             ),
@@ -352,14 +336,10 @@ class _ProductDialogState extends State<ProductDialog> {
                           Expanded(
                             child: CustomTextField(
                               ctr: _currencyCtr,
-                              title: context.tr(
-                                LocaleKeys.product_currency_title,
-                              ),
-                              hintText: context.tr(
-                                LocaleKeys.product_currency_hint,
-                              ),
+                              title: "Currency",
+                              hintText: "Currency",
                               validator: (v) => (v == null || v.isEmpty)
-                                  ? context.tr(LocaleKeys.empty_filed)
+                                  ? 'This field is required'
                                   : null,
                             ),
                           ),
@@ -372,24 +352,20 @@ class _ProductDialogState extends State<ProductDialog> {
                             child: CustomTextField(
                               ctr: _amountCtr,
                               keyboardType: TextInputType.number,
-                              title: context.tr(
-                                LocaleKeys.product_amount_title,
-                              ),
-                              hintText: context.tr(
-                                LocaleKeys.product_amount_hint,
-                              ),
+                              title: "Amount",
+                              hintText: "Amount",
                               inputFormatters: [
                                 FilteringTextInputFormatter.allow(
                                   RegExp(r'^\d*\.?\d*'),
                                 ),
                               ],
                               validator: (v) {
-                                if (v == null || v.isEmpty)
-                                  return context.tr(LocaleKeys.empty_filed);
-                                if (double.tryParse(v) == null)
-                                  return context.tr(
-                                    LocaleKeys.please_enter_valid_number,
-                                  );
+                                if (v == null || v.isEmpty) {
+                                  return 'This field is required';
+                                }
+                                if (double.tryParse(v) == null) {
+                                  return "Please enter a valid number";
+                                }
                                 return null;
                               },
                             ),
@@ -399,12 +375,8 @@ class _ProductDialogState extends State<ProductDialog> {
                             child: CustomDropDownMenu(
                               isSearch: true,
                               isLoadingFetch: isLoadingMeasurement,
-                              title: context.tr(
-                                LocaleKeys.product_measurement_title,
-                              ),
-                              hint: context.tr(
-                                LocaleKeys.product_measurement_hint,
-                              ),
+                              title: "Measurement",
+                              hint: "Measurement",
                               id: measurements.isNotEmpty
                                   ? selectMeasurement?.toString()
                                   : null,
@@ -474,7 +446,7 @@ class _ProductDialogState extends State<ProductDialog> {
                         title: "Product Title (English)",
                         hintText: "e.g. Organic Green Tea",
                         validator: (v) => (v == null || v.isEmpty)
-                            ? context.tr(LocaleKeys.empty_filed)
+                            ? 'This field is required'
                             : null,
                       ),
                       const SizedBox(height: 12),
@@ -486,7 +458,7 @@ class _ProductDialogState extends State<ProductDialog> {
                         minLines: 3,
                         maxLines: 5,
                         validator: (v) => (v == null || v.isEmpty)
-                            ? context.tr(LocaleKeys.empty_filed)
+                            ? 'This field is required'
                             : null,
                       ),
                       const SizedBox(height: 20),
@@ -527,7 +499,7 @@ class _ProductDialogState extends State<ProductDialog> {
                         ),
                       ),
                       child: Text(
-                        context.tr(LocaleKeys.cancel),
+                        'Cancel',
                         style: const TextStyle(
                           color: Color(0xFF374151),
                           fontWeight: FontWeight.w500,
@@ -603,9 +575,7 @@ class _ProductDialogState extends State<ProductDialog> {
                               ],
                             )
                           : Text(
-                              isEdit
-                                  ? context.tr(LocaleKeys.update)
-                                  : context.tr(LocaleKeys.create),
+                              isEdit ? 'Update' : 'Create',
                               style: const TextStyle(
                                 fontWeight: FontWeight.w600,
                                 color: Colors.white,
@@ -680,7 +650,7 @@ class _ProductDialogState extends State<ProductDialog> {
             child: OutlinedButton.icon(
               onPressed: _pickFiles,
               icon: const Icon(Icons.upload, size: 16),
-              label: Text(context.tr(LocaleKeys.add_images)),
+              label: Text('Add images'),
               style: OutlinedButton.styleFrom(
                 padding: const EdgeInsets.symmetric(
                   horizontal: 16,
@@ -701,7 +671,7 @@ class _ProductDialogState extends State<ProductDialog> {
           // Existing images (only for edit)
           if (hasExistingImages) ...[
             Text(
-              context.tr(LocaleKeys.existing_images),
+              'Existing images:',
               style: const TextStyle(
                 fontSize: 12,
                 fontWeight: FontWeight.w500,
@@ -743,8 +713,8 @@ class _ProductDialogState extends State<ProductDialog> {
           if (hasNewImages) ...[
             Text(
               widget.product != null
-                  ? context.tr(LocaleKeys.new_images_to_upload)
-                  : context.tr(LocaleKeys.selected_images),
+                  ? 'New images to upload:'
+                  : 'Selected images:',
               style: const TextStyle(
                 fontSize: 12,
                 fontWeight: FontWeight.w500,
@@ -800,15 +770,8 @@ class _ProductDialogState extends State<ProductDialog> {
             ),
             const SizedBox(height: 8),
             Text(
-              context.tr(
-                LocaleKeys.file_size_kb,
-                namedArgs: {
-                  'size':
-                      (newImages.fold<int>(0, (sum, f) => sum + f.file.length) /
-                              1024)
-                          .toStringAsFixed(1),
-                },
-              ),
+              "size: ${(newImages.fold<int>(0, (sum, f) => sum + f.file.length) / 1024).toStringAsFixed(1)}",
+
               style: const TextStyle(fontSize: 11, color: Colors.grey),
             ),
           ],

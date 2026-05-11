@@ -1,11 +1,8 @@
-import 'package:e_commerce_startup_web/core/utils/locale_keys.g.dart';
 import 'package:e_commerce_startup_web/presentation/pages/orders/viewmodel/orders_viewmodel.dart';
 import 'package:e_commerce_startup_web/presentation/pages/orders/widgets/order_helpers.dart';
-import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
-// All statuses supported by PUT /api/v1/admin/order/edit-status
 const _editableStatuses = [
   'NEW',
   'WAITING',
@@ -25,12 +22,13 @@ void showUpdateStatusDialog(
   OrdersViewmodel viewmodel,
 ) {
   String selectedStatus = order.orderStatus;
+  final scaffoldContext = context; // capture before dialog opens
 
   showDialog(
     context: context,
-    builder: (BuildContext context) {
+    builder: (BuildContext dialogContext) {
       return StatefulBuilder(
-        builder: (context, setState) {
+        builder: (dialogContext, setState) {
           final bool isUpdating = viewmodel.isOrderEditing(order.orderId);
 
           return Dialog(
@@ -66,9 +64,9 @@ void showUpdateStatusDialog(
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text(
-                                context.tr(LocaleKeys.update_order_status),
-                                style: const TextStyle(
+                              const Text(
+                                'Update Order Status',
+                                style: TextStyle(
                                   fontWeight: FontWeight.w700,
                                   fontSize: 16,
                                   color: Color(0xFF111827),
@@ -87,7 +85,7 @@ void showUpdateStatusDialog(
                         IconButton(
                           onPressed: isUpdating
                               ? null
-                              : () => Navigator.of(context).pop(),
+                              : () => Navigator.of(dialogContext).pop(),
                           icon: const Icon(
                             CupertinoIcons.xmark,
                             size: 16,
@@ -113,7 +111,7 @@ void showUpdateStatusDialog(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          context.tr(LocaleKeys.select_new_status),
+                          'Select new status',
                           style: TextStyle(
                             fontWeight: FontWeight.w600,
                             fontSize: 13,
@@ -192,7 +190,7 @@ void showUpdateStatusDialog(
                                     ),
                                     const SizedBox(width: 8),
                                     Text(
-                                      getStatusText(context, status),
+                                      getStatusText(status),
                                       style: TextStyle(
                                         fontSize: 13,
                                         fontWeight: isSelected
@@ -226,7 +224,7 @@ void showUpdateStatusDialog(
                           child: OutlinedButton(
                             onPressed: isUpdating
                                 ? null
-                                : () => Navigator.of(context).pop(),
+                                : () => Navigator.of(dialogContext).pop(),
                             style: OutlinedButton.styleFrom(
                               padding: const EdgeInsets.symmetric(vertical: 12),
                               side: const BorderSide(color: Color(0xFFD1D5DB)),
@@ -234,9 +232,9 @@ void showUpdateStatusDialog(
                                 borderRadius: BorderRadius.circular(10),
                               ),
                             ),
-                            child: Text(
-                              context.tr(LocaleKeys.cancel),
-                              style: const TextStyle(
+                            child: const Text(
+                              'Cancel',
+                              style: TextStyle(
                                 color: Color(0xFF374151),
                                 fontWeight: FontWeight.w500,
                               ),
@@ -250,46 +248,44 @@ void showUpdateStatusDialog(
                                 !isUpdating &&
                                     selectedStatus != order.orderStatus
                                 ? () async {
-                                    // Trigger rebuild to reflect isUpdating state
-                                    setState(() {});
-                                    final success =
-                                        await viewmodel.editOrderStatus(
+                                    final success = await viewmodel
+                                        .editOrderStatus(
                                           order.orderId,
                                           selectedStatus,
                                         );
-                                    if (context.mounted) {
-                                      Navigator.of(context).pop();
-                                      if (success) {
-                                        ScaffoldMessenger.of(
-                                          context,
-                                        ).showSnackBar(
-                                          SnackBar(
-                                            content: Row(
-                                              children: [
-                                                const Icon(
-                                                  CupertinoIcons
-                                                      .check_mark_circled_solid,
-                                                  color: Colors.white,
-                                                  size: 16,
-                                                ),
-                                                const SizedBox(width: 8),
-                                                Text(
-                                                  "${context.tr(LocaleKeys.order_status_updated)} #${order.orderId}",
-                                                ),
-                                              ],
-                                            ),
-                                            backgroundColor:
-                                                Colors.green.shade600,
-                                            behavior: SnackBarBehavior.floating,
-                                            shape: RoundedRectangleBorder(
-                                              borderRadius: BorderRadius.circular(
-                                                10,
+                                    if (dialogContext.mounted) {
+                                      Navigator.of(dialogContext).pop();
+                                    }
+                                    if (success && scaffoldContext.mounted) {
+                                      ScaffoldMessenger.of(
+                                        scaffoldContext,
+                                      ).showSnackBar(
+                                        SnackBar(
+                                          content: Row(
+                                            children: [
+                                              const Icon(
+                                                CupertinoIcons
+                                                    .check_mark_circled_solid,
+                                                color: Colors.white,
+                                                size: 16,
                                               ),
-                                            ),
-                                            margin: const EdgeInsets.all(16),
+                                              const SizedBox(width: 8),
+                                              Text(
+                                                "Order status updated #${order.orderId}",
+                                              ),
+                                            ],
                                           ),
-                                        );
-                                      }
+                                          backgroundColor:
+                                              Colors.green.shade600,
+                                          behavior: SnackBarBehavior.floating,
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius: BorderRadius.circular(
+                                              10,
+                                            ),
+                                          ),
+                                          margin: const EdgeInsets.all(16),
+                                        ),
+                                      );
                                     }
                                   }
                                 : null,
@@ -311,7 +307,7 @@ void showUpdateStatusDialog(
                                     ),
                                   )
                                 : Text(
-                                    context.tr(LocaleKeys.update),
+                                    'Update',
                                     style: TextStyle(
                                       fontWeight: FontWeight.w600,
                                       color: selectedStatus != order.orderStatus

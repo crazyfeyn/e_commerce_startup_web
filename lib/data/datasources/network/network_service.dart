@@ -1,8 +1,6 @@
 import 'dart:io';
 
-import 'package:e_commerce_startup_web/core/utils/locale_keys.g.dart';
 import 'package:e_commerce_startup_web/data/datasources/network/network_helper.dart';
-import 'package:easy_localization/easy_localization.dart';
 import 'package:dio/dio.dart';
 
 class NetworkService {
@@ -50,12 +48,12 @@ class NetworkService {
       throw NetworkException.fromDioError(e);
     } on SocketException catch (_) {
       throw NetworkException(
-        LocaleKeys.check_internet_connection.tr(),
+        "Check internet connection",
         NetworkExceptionType.noInternet,
       );
     } catch (e) {
       throw NetworkException(
-        LocaleKeys.dio_unknown_message.tr(args: [e.toString()]),
+        "Unknown error: ${e.toString()}",
         NetworkExceptionType.unknown,
       );
     }
@@ -79,12 +77,12 @@ class NetworkService {
       throw NetworkException.fromDioError(e);
     } on SocketException catch (_) {
       throw NetworkException(
-        LocaleKeys.check_internet_connection.tr(),
+        "Check internet connection",
         NetworkExceptionType.noInternet,
       );
     } catch (e) {
       throw NetworkException(
-        LocaleKeys.dio_unknown_message.tr(args: [e.toString()]),
+        "Unknown error: ${e.toString()}",
         NetworkExceptionType.unknown,
       );
     }
@@ -108,12 +106,12 @@ class NetworkService {
       throw NetworkException.fromDioError(e);
     } on SocketException catch (_) {
       throw NetworkException(
-        LocaleKeys.check_internet_connection.tr(),
+        "Check internet connection",
         NetworkExceptionType.noInternet,
       );
     } catch (e) {
       throw NetworkException(
-        LocaleKeys.dio_unknown_message.tr(args: [e.toString()]),
+        "Unknown error: ${e.toString()}",
         NetworkExceptionType.unknown,
       );
     }
@@ -135,12 +133,12 @@ class NetworkService {
       throw NetworkException.fromDioError(e);
     } on SocketException catch (_) {
       throw NetworkException(
-        LocaleKeys.check_internet_connection.tr(),
+        "Check internet connection",
         NetworkExceptionType.noInternet,
       );
     } catch (e) {
       throw NetworkException(
-        LocaleKeys.dio_unknown_message.tr(args: [e.toString()]),
+        "Unknown error: ${e.toString()}",
         NetworkExceptionType.unknown,
       );
     }

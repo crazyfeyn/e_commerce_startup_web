@@ -2,17 +2,15 @@ import 'dart:typed_data';
 
 import 'package:e_commerce_startup_web/core/utils/app_colors.dart';
 import 'package:e_commerce_startup_web/core/utils/app_enums.dart';
-import 'package:e_commerce_startup_web/core/utils/locale_keys.g.dart';
 import 'package:e_commerce_startup_web/data/datasources/network/network_service.dart';
 import 'package:e_commerce_startup_web/presentation/pages/categories/viewmodel/categories_viewmodel.dart';
 import 'package:e_commerce_startup_web/presentation/pages/categories/widget/category_dialog.dart';
 import 'package:e_commerce_startup_web/presentation/widgets/network_image_loader.dart';
-import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-// Flex weights: ID | Icon | EN (now primary) | UZ | KR | Prompt | Actions
+// Flex weights: ID | Icon | EN | UZ | KR | Description | Actions
 const List<int> _flex = [1, 1, 2, 2, 2, 2, 2];
 
 class CategoriesPage extends StatelessWidget {
@@ -66,9 +64,9 @@ class CategoriesPage extends StatelessWidget {
             ),
           ),
           const SizedBox(width: 12),
-          Text(
-            context.tr(LocaleKeys.menu_categories),
-            style: const TextStyle(
+          const Text(
+            'Categories',
+            style: TextStyle(
               fontWeight: FontWeight.w700,
               fontSize: 18,
               color: Color(0xFF111827),
@@ -140,9 +138,9 @@ class CategoriesPage extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 20),
-          Text(
-            context.tr(LocaleKeys.menu_categories),
-            style: const TextStyle(
+          const Text(
+            'Categories',
+            style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.w600,
               color: Color(0xFF111827),
@@ -194,14 +192,14 @@ class CategoriesPage extends StatelessWidget {
   }
 
   Widget _buildHeaderRow(BuildContext context) {
-    final labels = [
-      context.tr(LocaleKeys.id),
-      context.tr(LocaleKeys.icon),
-      "EN Title", // Primary input language
-      "UZ Title", // Auto-translated
-      "KR Title", // Auto-translated
-      context.tr(LocaleKeys.category_prompt_title),
-      context.tr(LocaleKeys.actions),
+    const labels = [
+      'ID',
+      'Icon',
+      'EN Title',
+      'UZ Title',
+      'KR Title',
+      'Description',
+      'Actions',
     ];
 
     return Container(
@@ -270,7 +268,7 @@ class CategoriesPage extends StatelessWidget {
                     borderRadius: BorderRadius.circular(6),
                   ),
                   child: Text(
-                    "#${category.id ?? '-'}",
+                    '#${category.id ?? '-'}',
                     style: const TextStyle(
                       fontWeight: FontWeight.w700,
                       color: Color(0xFFF97316),
@@ -291,7 +289,7 @@ class CategoriesPage extends StatelessWidget {
             ),
           ),
 
-          // EN Title (original)
+          // EN Title
           Expanded(
             flex: _flex[2],
             child: Padding(
@@ -300,25 +298,25 @@ class CategoriesPage extends StatelessWidget {
             ),
           ),
 
-          // UZ Title (auto-translated)
-          Expanded(
-            flex: _flex[3],
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 12),
-              child: _buildNameCell(category.titleData?.uz ?? ''),
-            ),
-          ),
+          // // UZ Title
+          // Expanded(
+          //   flex: _flex[3],
+          //   child: Padding(
+          //     padding: const EdgeInsets.symmetric(horizontal: 12),
+          //     child: _buildNameCell(category.titleData?.uz ?? ''),
+          //   ),
+          // ),
 
-          // KR Title (auto-translated)
-          Expanded(
-            flex: _flex[4],
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 12),
-              child: _buildNameCell(category.titleData?.kor ?? ''),
-            ),
-          ),
+          // // KR Title
+          // Expanded(
+          //   flex: _flex[4],
+          //   child: Padding(
+          //     padding: const EdgeInsets.symmetric(horizontal: 12),
+          //     child: _buildNameCell(category.titleData?.kor ?? ''),
+          //   ),
+          // ),
 
-          // Prompt (description used for Anthropic)
+          // Description
           Expanded(
             flex: _flex[5],
             child: Padding(
@@ -369,7 +367,7 @@ class CategoriesPage extends StatelessWidget {
                       color: Colors.orange.shade600,
                     ),
                     bg: Colors.orange.shade50,
-                    tip: context.tr(LocaleKeys.edit_category),
+                    tip: 'Edit category',
                   ),
                   const SizedBox(width: 4),
                   _actionBtn(
@@ -381,7 +379,7 @@ class CategoriesPage extends StatelessWidget {
                       color: AppColors.red500,
                     ),
                     bg: Colors.red.shade50,
-                    tip: context.tr(LocaleKeys.delete_category),
+                    tip: 'Delete category',
                   ),
                 ],
               ),
@@ -415,7 +413,7 @@ class CategoriesPage extends StatelessWidget {
     if (imageIdentity.isEmpty) return _buildPlaceholderIcon();
 
     final url =
-        "${NetworkService.getService}${NetworkService.apiFileDownload(imageIdentity)}";
+        '${NetworkService.getService}${NetworkService.apiFileDownload(imageIdentity)}';
 
     return Container(
       width: 40,
@@ -495,9 +493,9 @@ class CategoriesPage extends StatelessWidget {
       foregroundColor: Colors.white,
       elevation: 2,
       icon: const Icon(Icons.add, size: 20),
-      label: Text(
-        context.tr(LocaleKeys.add_new_category),
-        style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13),
+      label: const Text(
+        'Add category',
+        style: TextStyle(fontWeight: FontWeight.w600, fontSize: 13),
       ),
     );
   }
@@ -539,10 +537,10 @@ class CategoriesPage extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(width: 14),
-                    Expanded(
+                    const Expanded(
                       child: Text(
-                        ctx.tr(LocaleKeys.delete_category_title),
-                        style: const TextStyle(
+                        'Delete category',
+                        style: TextStyle(
                           fontWeight: FontWeight.w700,
                           fontSize: 16,
                           color: Color(0xFF111827),
@@ -555,14 +553,7 @@ class CategoriesPage extends StatelessWidget {
               Padding(
                 padding: const EdgeInsets.all(20),
                 child: Text(
-                  ctx.tr(
-                    LocaleKeys.delete_category_message,
-                    args: [
-                      category.titleData?.en ??
-                          category.titleData?.uz ??
-                          ctx.tr(LocaleKeys.category_name_en_title),
-                    ],
-                  ),
+                  'Are you sure you want to delete "${category.titleData?.en ?? category.titleData?.uz ?? 'this category'}"?',
                   style: TextStyle(
                     fontSize: 14,
                     color: Colors.grey.shade600,
@@ -584,9 +575,9 @@ class CategoriesPage extends StatelessWidget {
                             borderRadius: BorderRadius.circular(10),
                           ),
                         ),
-                        child: Text(
-                          ctx.tr(LocaleKeys.cancel),
-                          style: const TextStyle(
+                        child: const Text(
+                          'Cancel',
+                          style: TextStyle(
                             color: Color(0xFF374151),
                             fontWeight: FontWeight.w500,
                           ),
@@ -607,9 +598,9 @@ class CategoriesPage extends StatelessWidget {
                             borderRadius: BorderRadius.circular(10),
                           ),
                         ),
-                        child: Text(
-                          ctx.tr(LocaleKeys.delete),
-                          style: const TextStyle(fontWeight: FontWeight.w600),
+                        child: const Text(
+                          'Delete',
+                          style: TextStyle(fontWeight: FontWeight.w600),
                         ),
                       ),
                     ),
