@@ -174,6 +174,11 @@ class NetworkService {
   static final String apiEditOrderStatus = "/api/v1/admin/order/edit-status";
   static const String apiChat = '/api/chat';
 
+  static final String apiCreateBarcodeProduct =
+      '/api/v1/admin/barcode/product/create';
+  static final String apiLookupBarcodeProduct =
+      '/api/v1/barcode/product/lookup';
+
   /* Http Params */
   static Map<String, dynamic> paramsLogin(String phone, String password) {
     return {"phoneNumber": phone, "password": password};
@@ -213,5 +218,24 @@ class NetworkService {
 
   static Map<String, dynamic> paramsEditProduct(int productId) {
     return {"productId": productId};
+  }
+
+  // ── Barcode params ─────────────────────────────────────
+  static Map<String, dynamic> paramsCreateBarcodeProduct({
+    required String barcode,
+    required String nameEn,
+    required List<String> ingredients,
+    required bool isHalal,
+  }) {
+    return {
+      'barcode': barcode,
+      'nameEn': nameEn,
+      'ingredients': ingredients,
+      'isHalal': isHalal,
+    };
+  }
+
+  static Map<String, dynamic> paramsLookupBarcodeProduct(String code) {
+    return {'code': code};
   }
 }

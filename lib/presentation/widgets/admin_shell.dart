@@ -1,6 +1,7 @@
 import 'package:e_commerce_startup_web/config/router/navigation_service.dart';
 import 'package:e_commerce_startup_web/core/utils/app_colors.dart';
 import 'package:e_commerce_startup_web/core/utils/app_styles.dart';
+import 'package:e_commerce_startup_web/presentation/pages/barcode/page/barcode_page.dart';
 import 'package:e_commerce_startup_web/presentation/pages/categories/page/categories_page.dart';
 import 'package:e_commerce_startup_web/presentation/pages/chat/page/chat_page.dart';
 import 'package:e_commerce_startup_web/presentation/pages/sold_products/page/sold_products.dart';
@@ -49,9 +50,7 @@ class _AdminShellState extends State<AdminShell> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: kIsWeb
-          ? null
-          : AppBar(title: Text('Admin Panel')),
+      appBar: kIsWeb ? null : AppBar(title: Text('Admin Panel')),
       body: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -60,10 +59,7 @@ class _AdminShellState extends State<AdminShell> {
             title: kIsWeb
                 ? Container(
                     padding: EdgeInsets.symmetric(vertical: 24, horizontal: 12),
-                    child: Text(
-                      'Admin Panel',
-                      style: AppStyles.bodyXLSemibold,
-                    ),
+                    child: Text('Admin Panel', style: AppStyles.bodyXLSemibold),
                   )
                 : null,
             style: SideMenuStyle(
@@ -104,6 +100,11 @@ class _AdminShellState extends State<AdminShell> {
                 onTap: onChanged,
                 icon: Icon(CupertinoIcons.sparkles),
               ),
+              SideMenuItem(
+                title: 'Barcode',
+                onTap: onChanged,
+                icon: const Icon(CupertinoIcons.barcode),
+              ),
             ],
           ),
           Expanded(child: widget.child),
@@ -125,6 +126,7 @@ class _AdminShellState extends State<AdminShell> {
       2 => ProductsPage.path,
       3 => SoldProductsPage.path,
       4 => ChatPage.path,
+      5 => BarcodePage.path,
       _ => OrdersPage.path,
     };
   }
@@ -135,6 +137,8 @@ class _AdminShellState extends State<AdminShell> {
       final p when p.startsWith(CategoriesPage.path) => 1,
       final p when p.startsWith(ProductsPage.path) => 2,
       final p when p.startsWith(SoldProductsPage.path) => 3,
+      final p when p.startsWith(ChatPage.path) => 4,
+      final p when p.startsWith(BarcodePage.path) => 5,
       _ => 0,
     };
   }
