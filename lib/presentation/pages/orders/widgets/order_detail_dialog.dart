@@ -118,6 +118,13 @@ void showOrderDetails(BuildContext context, dynamic order) {
                                   label: 'Address',
                                   value: order.receiverAddress,
                                 ),
+                                if (order.additionalInfo != null &&
+                                    order.additionalInfo!.isNotEmpty)
+                                  _buildInfoTile(
+                                    icon: CupertinoIcons.info_circle,
+                                    label: 'Note',
+                                    value: order.additionalInfo!,
+                                  ),
                               ],
                             ),
                           ),
