@@ -1,13 +1,11 @@
 import 'package:e_commerce_startup_web/config/router/navigation_service.dart';
 import 'package:e_commerce_startup_web/core/utils/app_enums.dart';
 import 'package:e_commerce_startup_web/core/utils/app_styles.dart';
-import 'package:e_commerce_startup_web/core/utils/locale_keys.g.dart';
 import 'package:e_commerce_startup_web/presentation/pages/login/viewmodel/login_viewmodel.dart';
 import 'package:e_commerce_startup_web/presentation/pages/orders/page/orders_page.dart';
 import 'package:e_commerce_startup_web/presentation/widgets/custom_elevated_button.dart';
 import 'package:e_commerce_startup_web/presentation/widgets/custom_phone_field.dart';
 import 'package:e_commerce_startup_web/presentation/widgets/custom_text_field.dart';
-import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -50,7 +48,7 @@ class _LoginPageState extends State<LoginPage> {
                     Text(
                       viewmodel.isRegisterMode
                           ? "Register admin"
-                          : context.tr(LocaleKeys.login_to_admin),
+                          : 'Admin Login',
                       style: AppStyles.titleXLSemibold,
                       textAlign: TextAlign.center,
                     ),
@@ -83,12 +81,12 @@ class _LoginPageState extends State<LoginPage> {
                     ],
                     CustomPhoneField(
                       controller: _phoneController,
-                      title: context.tr(LocaleKeys.phone_number),
+                      title: 'Phone number',
                     ),
                     const SizedBox(height: 12),
                     CustomTextField(
-                      title: context.tr(LocaleKeys.password_title_field),
-                      hintText: context.tr(LocaleKeys.password_hint_field),
+                      title: 'Password',
+                      hintText: 'Enter password...',
                       suffixIcon: viewmodel.obscureText
                           ? CupertinoIcons.eye_slash
                           : CupertinoIcons.eye,
@@ -97,7 +95,7 @@ class _LoginPageState extends State<LoginPage> {
                       ctr: _passwordController,
                       validator: (value) {
                         if (value == null || value.isEmpty) {
-                          return context.tr(LocaleKeys.password_error_field_empty);
+                          return 'Please enter your password';
                         }
                         return null;
                       },
@@ -131,7 +129,7 @@ class _LoginPageState extends State<LoginPage> {
                       },
                       title: viewmodel.isRegisterMode
                           ? "Register"
-                          : context.tr(LocaleKeys.login_btn),
+                          : 'Login',
                     ),
                     const SizedBox(height: 12),
                     TextButton(

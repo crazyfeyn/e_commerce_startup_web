@@ -1,15 +1,8 @@
 import 'package:e_commerce_startup_web/data/models/order_product_model.dart';
 import 'package:e_commerce_startup_web/presentation/pages/orders/widgets/order_helpers.dart';
-import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-
-import '../../../../core/utils/locale_keys.g.dart';
-
-String _getProductDisplayName(OrderProductModel product) {
-  return "Product #${product.productId}";
-}
 
 void showOrderDetails(BuildContext context, dynamic order) {
   print("📦 Showing order details for ID: ${order.orderId}");
@@ -56,7 +49,7 @@ void showOrderDetails(BuildContext context, dynamic order) {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            context.tr(LocaleKeys.order),
+                            'Order',
                             style: TextStyle(
                               color: Colors.white.withOpacity(0.75),
                               fontSize: 12,
@@ -108,25 +101,30 @@ void showOrderDetails(BuildContext context, dynamic order) {
                               context: context,
                               icon: CupertinoIcons.person_circle,
                               iconColor: const Color(0xFF4F46E5),
-                              title: context.tr(
-                                LocaleKeys.customer_information,
-                              ),
+                              title: "Customer information",
                               children: [
                                 _buildInfoTile(
                                   icon: CupertinoIcons.person,
-                                  label: context.tr(LocaleKeys.name),
+                                  label: 'Name',
                                   value: order.receiverName,
                                 ),
                                 _buildInfoTile(
                                   icon: CupertinoIcons.phone,
-                                  label: context.tr(LocaleKeys.phone),
+                                  label: 'Phone',
                                   value: order.receiverPhone,
                                 ),
                                 _buildInfoTile(
                                   icon: CupertinoIcons.location,
-                                  label: context.tr(LocaleKeys.address),
+                                  label: 'Address',
                                   value: order.receiverAddress,
                                 ),
+                                if (order.additionalInfo != null &&
+                                    order.additionalInfo!.isNotEmpty)
+                                  _buildInfoTile(
+                                    icon: CupertinoIcons.info_circle,
+                                    label: 'Note',
+                                    value: order.additionalInfo!,
+                                  ),
                               ],
                             ),
                           ),
@@ -136,32 +134,28 @@ void showOrderDetails(BuildContext context, dynamic order) {
                               context: context,
                               icon: CupertinoIcons.doc_text,
                               iconColor: Colors.teal.shade600,
-                              title: context.tr(LocaleKeys.order_information),
+                              title: 'Order information',
                               children: [
                                 _buildInfoTile(
                                   icon: CupertinoIcons.circle_fill,
-                                  label: context.tr(LocaleKeys.order_status),
-                                  value: getStatusText(
-                                    context,
-                                    order.orderStatus,
-                                  ),
+                                  label: 'Status',
+                                  value: getStatusText(order.orderStatus),
                                   valueColor: getStatusTextColor(
                                     order.orderStatus,
                                   ),
                                 ),
                                 _buildInfoTile(
                                   icon: CupertinoIcons.creditcard,
-                                  label: context.tr(LocaleKeys.payment_method),
+                                  label: 'Payment method',
                                   value: order.paymentMethod != null
                                       ? getPaymentMethodText(
-                                          context,
                                           order.paymentMethod,
                                         )
                                       : "-",
                                 ),
                                 _buildInfoTile(
                                   icon: CupertinoIcons.money_dollar_circle,
-                                  label: context.tr(LocaleKeys.total_price),
+                                  label: 'Total price',
                                   value:
                                       "${NumberFormat('#,###').format(order.totalPrice)} ${order.currency.toUpperCase()}",
                                   valueColor: Colors.green.shade700,
@@ -169,7 +163,7 @@ void showOrderDetails(BuildContext context, dynamic order) {
                                 ),
                                 _buildInfoTile(
                                   icon: CupertinoIcons.calendar,
-                                  label: context.tr(LocaleKeys.order_date),
+                                  label: 'Order date',
                                   value: DateFormat(
                                     'dd MMM yyyy · HH:mm',
                                   ).format(order.createdAt),
@@ -188,7 +182,7 @@ void showOrderDetails(BuildContext context, dynamic order) {
                         icon: CupertinoIcons.cube_box,
                         iconColor: Colors.orange.shade600,
                         title:
-                            "${context.tr(LocaleKeys.products)}  ·  ${order.products.length} items",
+                            "${'Products'}  ·  ${order.products.length} items",
                         children: [
                           ...order.products.asMap().entries.map<Widget>((
                             entry,
@@ -201,7 +195,7 @@ void showOrderDetails(BuildContext context, dynamic order) {
                                     ? 10
                                     : 0,
                               ),
-                              child: _buildProductCard(product),
+                              child: _buildProductCard(context, product),
                             );
                           }).toList(),
                         ],
@@ -238,7 +232,7 @@ void showOrderDetails(BuildContext context, dynamic order) {
                           vertical: 12,
                         ),
                       ),
-                      child: Text(context.tr(LocaleKeys.close)),
+                      child: Text('Close'),
                     ),
                   ],
                 ),
@@ -345,7 +339,9 @@ Widget _buildInfoTile({
   );
 }
 
-Widget _buildProductCard(OrderProductModel product) {
+Widget _buildProductCard(BuildContext context, OrderProductModel product) {
+  final String name = product.displayName("en");
+
   return Container(
     padding: const EdgeInsets.all(12),
     decoration: BoxDecoration(
@@ -374,7 +370,7 @@ Widget _buildProductCard(OrderProductModel product) {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                _getProductDisplayName(product),
+                name,
                 style: const TextStyle(
                   fontWeight: FontWeight.w600,
                   fontSize: 13,
@@ -384,6 +380,25 @@ Widget _buildProductCard(OrderProductModel product) {
               const SizedBox(height: 3),
               Row(
                 children: [
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 6,
+                      vertical: 2,
+                    ),
+                    decoration: BoxDecoration(
+                      color: Colors.grey.shade100,
+                      borderRadius: BorderRadius.circular(4),
+                    ),
+                    child: Text(
+                      "#${product.productId}",
+                      style: TextStyle(
+                        fontSize: 11,
+                        color: Colors.grey.shade500,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 6),
                   Container(
                     padding: const EdgeInsets.symmetric(
                       horizontal: 6,

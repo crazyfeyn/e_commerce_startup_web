@@ -1,8 +1,6 @@
 import 'package:country_picker/country_picker.dart';
 import 'package:e_commerce_startup_web/core/utils/app_colors.dart';
 import 'package:e_commerce_startup_web/core/utils/app_styles.dart';
-import 'package:e_commerce_startup_web/core/utils/locale_keys.g.dart';
-import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
 
@@ -69,7 +67,7 @@ class _CustomPhoneFieldState extends State<CustomPhoneField> {
           },
           validator: (value) {
             if (value == null || value.isEmpty) {
-              return context.tr(LocaleKeys.phone_number_error_field_empty);
+              return 'Please enter phone number';
             }
             return null;
           },

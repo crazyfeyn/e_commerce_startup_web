@@ -1,31 +1,36 @@
-import 'package:e_commerce_startup_web/core/utils/locale_keys.g.dart';
 import 'package:e_commerce_startup_web/presentation/pages/orders/viewmodel/orders_viewmodel.dart';
 import 'package:e_commerce_startup_web/presentation/pages/orders/widgets/order_helpers.dart';
-import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+
+const _editableStatuses = [
+  'NEW',
+  'WAITING',
+  'CONFIRMED',
+  'PAYMENT_CREATED',
+  'PAYMENT_PENDING',
+  'PAYMENT_FAILED',
+  'PAYMENT_SUCCEEDED',
+  'DELIVERED',
+  'COMPLETED',
+  'CANCELLED',
+];
 
 void showUpdateStatusDialog(
   BuildContext context,
   dynamic order,
   OrdersViewmodel viewmodel,
 ) {
-  final statuses = [
-    'pending',
-    'confirmed',
-    'processing',
-    'shipped',
-    'delivered',
-    'cancelled',
-  ];
-
   String selectedStatus = order.orderStatus;
+  final scaffoldContext = context; // capture before dialog opens
 
   showDialog(
     context: context,
-    builder: (BuildContext context) {
+    builder: (BuildContext dialogContext) {
       return StatefulBuilder(
-        builder: (context, setState) {
+        builder: (dialogContext, setState) {
+          final bool isUpdating = viewmodel.isOrderEditing(order.orderId);
+
           return Dialog(
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(20),
@@ -59,9 +64,9 @@ void showUpdateStatusDialog(
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text(
-                                context.tr(LocaleKeys.update_order_status),
-                                style: const TextStyle(
+                              const Text(
+                                'Update Order Status',
+                                style: TextStyle(
                                   fontWeight: FontWeight.w700,
                                   fontSize: 16,
                                   color: Color(0xFF111827),
@@ -78,7 +83,9 @@ void showUpdateStatusDialog(
                           ),
                         ),
                         IconButton(
-                          onPressed: () => Navigator.of(context).pop(),
+                          onPressed: isUpdating
+                              ? null
+                              : () => Navigator.of(dialogContext).pop(),
                           icon: const Icon(
                             CupertinoIcons.xmark,
                             size: 16,
@@ -104,7 +111,7 @@ void showUpdateStatusDialog(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          context.tr(LocaleKeys.select_new_status),
+                          'Select new status',
                           style: TextStyle(
                             fontWeight: FontWeight.w600,
                             fontSize: 13,
@@ -112,7 +119,7 @@ void showUpdateStatusDialog(
                           ),
                         ),
                         const SizedBox(height: 12),
-                        ...statuses.map((status) {
+                        ..._editableStatuses.map((status) {
                           final bool isSelected = selectedStatus == status;
                           final Color statusColor = getStatusTextColor(status);
                           final Color statusBgColor = getStatusColor(status);
@@ -120,9 +127,11 @@ void showUpdateStatusDialog(
                           return Padding(
                             padding: const EdgeInsets.only(bottom: 8),
                             child: InkWell(
-                              onTap: () {
-                                setState(() => selectedStatus = status);
-                              },
+                              onTap: isUpdating
+                                  ? null
+                                  : () {
+                                      setState(() => selectedStatus = status);
+                                    },
                               borderRadius: BorderRadius.circular(10),
                               child: AnimatedContainer(
                                 duration: const Duration(milliseconds: 150),
@@ -181,7 +190,7 @@ void showUpdateStatusDialog(
                                     ),
                                     const SizedBox(width: 8),
                                     Text(
-                                      getStatusText(context, status),
+                                      getStatusText(status),
                                       style: TextStyle(
                                         fontSize: 13,
                                         fontWeight: isSelected
@@ -197,7 +206,7 @@ void showUpdateStatusDialog(
                               ),
                             ),
                           );
-                        }).toList(),
+                        }),
                       ],
                     ),
                   ),
@@ -213,7 +222,9 @@ void showUpdateStatusDialog(
                       children: [
                         Expanded(
                           child: OutlinedButton(
-                            onPressed: () => Navigator.of(context).pop(),
+                            onPressed: isUpdating
+                                ? null
+                                : () => Navigator.of(dialogContext).pop(),
                             style: OutlinedButton.styleFrom(
                               padding: const EdgeInsets.symmetric(vertical: 12),
                               side: const BorderSide(color: Color(0xFFD1D5DB)),
@@ -221,9 +232,9 @@ void showUpdateStatusDialog(
                                 borderRadius: BorderRadius.circular(10),
                               ),
                             ),
-                            child: Text(
-                              context.tr(LocaleKeys.cancel),
-                              style: const TextStyle(
+                            child: const Text(
+                              'Cancel',
+                              style: TextStyle(
                                 color: Color(0xFF374151),
                                 fontWeight: FontWeight.w500,
                               ),
@@ -233,35 +244,49 @@ void showUpdateStatusDialog(
                         const SizedBox(width: 10),
                         Expanded(
                           child: FilledButton(
-                            onPressed: selectedStatus != order.orderStatus
-                                ? () {
-                                    Navigator.of(context).pop();
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      SnackBar(
-                                        content: Row(
-                                          children: [
-                                            const Icon(
-                                              CupertinoIcons
-                                                  .check_mark_circled_solid,
-                                              color: Colors.white,
-                                              size: 16,
-                                            ),
-                                            const SizedBox(width: 8),
-                                            Text(
-                                              "${context.tr(LocaleKeys.order_status_updated)} #${order.orderId}",
-                                            ),
-                                          ],
-                                        ),
-                                        backgroundColor: Colors.green.shade600,
-                                        behavior: SnackBarBehavior.floating,
-                                        shape: RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.circular(
-                                            10,
+                            onPressed:
+                                !isUpdating &&
+                                    selectedStatus != order.orderStatus
+                                ? () async {
+                                    final success = await viewmodel
+                                        .editOrderStatus(
+                                          order.orderId,
+                                          selectedStatus,
+                                        );
+                                    if (dialogContext.mounted) {
+                                      Navigator.of(dialogContext).pop();
+                                    }
+                                    if (success && scaffoldContext.mounted) {
+                                      ScaffoldMessenger.of(
+                                        scaffoldContext,
+                                      ).showSnackBar(
+                                        SnackBar(
+                                          content: Row(
+                                            children: [
+                                              const Icon(
+                                                CupertinoIcons
+                                                    .check_mark_circled_solid,
+                                                color: Colors.white,
+                                                size: 16,
+                                              ),
+                                              const SizedBox(width: 8),
+                                              Text(
+                                                "Order status updated #${order.orderId}",
+                                              ),
+                                            ],
                                           ),
+                                          backgroundColor:
+                                              Colors.green.shade600,
+                                          behavior: SnackBarBehavior.floating,
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius: BorderRadius.circular(
+                                              10,
+                                            ),
+                                          ),
+                                          margin: const EdgeInsets.all(16),
                                         ),
-                                        margin: const EdgeInsets.all(16),
-                                      ),
-                                    );
+                                      );
+                                    }
                                   }
                                 : null,
                             style: FilledButton.styleFrom(
@@ -272,15 +297,24 @@ void showUpdateStatusDialog(
                                 borderRadius: BorderRadius.circular(10),
                               ),
                             ),
-                            child: Text(
-                              context.tr(LocaleKeys.update),
-                              style: TextStyle(
-                                fontWeight: FontWeight.w600,
-                                color: selectedStatus != order.orderStatus
-                                    ? Colors.white
-                                    : Colors.grey.shade400,
-                              ),
-                            ),
+                            child: isUpdating
+                                ? SizedBox(
+                                    height: 16,
+                                    width: 16,
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2,
+                                      color: Colors.grey.shade400,
+                                    ),
+                                  )
+                                : Text(
+                                    'Update',
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.w600,
+                                      color: selectedStatus != order.orderStatus
+                                          ? Colors.white
+                                          : Colors.grey.shade400,
+                                    ),
+                                  ),
                           ),
                         ),
                       ],

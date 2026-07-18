@@ -1,8 +1,6 @@
-import 'package:e_commerce_startup_web/core/utils/locale_keys.g.dart';
 import 'package:e_commerce_startup_web/data/models/category_model.dart';
 import 'package:e_commerce_startup_web/data/datasources/network/network_service.dart';
 import 'package:e_commerce_startup_web/presentation/widgets/network_image_loader.dart';
-import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
@@ -108,11 +106,7 @@ class CategoryDialog {
                                   ),
                                 ),
                                 Text(
-                                  isEdit
-                                      ? ctx.tr(LocaleKeys.edit_category_title)
-                                      : ctx.tr(
-                                          LocaleKeys.create_category_title,
-                                        ),
+                                  isEdit ? 'Edit category' : "Create category",
                                   style: const TextStyle(
                                     color: Colors.white,
                                     fontSize: 18,
@@ -198,7 +192,7 @@ class CategoryDialog {
                             // Prompt / Description (for Anthropic context)
                             _buildTextField(
                               controller: promptController,
-                              label: ctx.tr(LocaleKeys.category_prompt_title),
+                              label: 'Description',
                               hintText:
                                   "Describe what this category is about. This helps AI generate accurate translations.",
                               icon: CupertinoIcons.text_alignleft,
@@ -262,7 +256,7 @@ class CategoryDialog {
                                 ),
                               ),
                               child: Text(
-                                ctx.tr(LocaleKeys.cancel),
+                                'Cancel',
                                 style: const TextStyle(
                                   color: Color(0xFF374151),
                                   fontWeight: FontWeight.w500,
@@ -293,10 +287,7 @@ class CategoryDialog {
                                                 ),
                                                 const SizedBox(width: 8),
                                                 Text(
-                                                  ctx.tr(
-                                                    LocaleKeys
-                                                        .please_fill_required_fields,
-                                                  ),
+                                                  "Please fill all required fields.",
                                                 ),
                                               ],
                                             ),
@@ -351,13 +342,11 @@ class CategoryDialog {
                                           ),
                                         ),
                                         const SizedBox(width: 8),
-                                        Text(ctx.tr(LocaleKeys.processing)),
+                                        Text('Processing...'),
                                       ],
                                     )
                                   : Text(
-                                      isEdit
-                                          ? ctx.tr(LocaleKeys.update)
-                                          : ctx.tr(LocaleKeys.create),
+                                      isEdit ? 'Update' : 'Create',
                                       style: TextStyle(
                                         fontWeight: FontWeight.w600,
                                         color: canSave
@@ -461,7 +450,7 @@ class CategoryDialog {
               ),
               const SizedBox(width: 8),
               Text(
-                ctx.tr(LocaleKeys.category_icon),
+                'Category icon',
                 style: const TextStyle(
                   fontSize: 13,
                   fontWeight: FontWeight.w600,
@@ -515,8 +504,7 @@ class CategoryDialog {
                           const SizedBox(width: 5),
                           Expanded(
                             child: Text(
-                              selectedImageName ??
-                                  ctx.tr(LocaleKeys.selected_image),
+                              selectedImageName ?? 'Selected image',
                               style: TextStyle(
                                 fontSize: 12,
                                 color: Colors.grey.shade600,
@@ -537,7 +525,7 @@ class CategoryDialog {
                           ),
                           const SizedBox(width: 5),
                           Text(
-                            ctx.tr(LocaleKeys.current_icon),
+                            'Current icon',
                             style: TextStyle(
                               fontSize: 12,
                               color: Colors.grey.shade600,
@@ -569,8 +557,8 @@ class CategoryDialog {
                           icon: const Icon(Icons.upload, size: 14),
                           label: Text(
                             hasNew || hasExisting
-                                ? ctx.tr(LocaleKeys.change_icon)
-                                : ctx.tr(LocaleKeys.upload_icon),
+                                ? 'Change icon'
+                                : 'Upload icon',
                             style: const TextStyle(fontSize: 12),
                           ),
                           style: FilledButton.styleFrom(
@@ -599,7 +587,7 @@ class CategoryDialog {
                               ),
                             ),
                             child: Text(
-                              ctx.tr(LocaleKeys.remove_selected_image),
+                              'Remove image',
                               style: TextStyle(
                                 fontSize: 12,
                                 color: Colors.red.shade600,

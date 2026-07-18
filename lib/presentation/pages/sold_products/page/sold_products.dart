@@ -1,8 +1,6 @@
 import 'package:e_commerce_startup_web/core/utils/app_enums.dart';
 import 'package:e_commerce_startup_web/core/utils/app_styles.dart';
-import 'package:e_commerce_startup_web/core/utils/locale_keys.g.dart';
 import 'package:e_commerce_startup_web/presentation/pages/products/viewmodel/products_viewmodel.dart';
-import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -67,7 +65,7 @@ class SoldProductsPage extends StatelessWidget {
           ),
           const SizedBox(width: 12),
           Text(
-            context.tr(LocaleKeys.menu_sold_products),
+            'Sold products',
             style: const TextStyle(
               fontWeight: FontWeight.w700,
               fontSize: 18,
@@ -140,7 +138,7 @@ class SoldProductsPage extends StatelessWidget {
           ),
           const SizedBox(height: 20),
           Text(
-            context.tr(LocaleKeys.menu_sold_products),
+            'Sold products',
             style: const TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.w600,
@@ -188,16 +186,10 @@ class SoldProductsPage extends StatelessWidget {
               ),
               child: Row(
                 children: [
-                  _buildHeaderCell(context.tr(LocaleKeys.id), flex: 1),
-                  _buildHeaderCell(
-                    context.tr(LocaleKeys.product_name),
-                    flex: 4,
-                  ),
-                  _buildHeaderCell(context.tr(LocaleKeys.sold_amount), flex: 2),
-                  _buildHeaderCell(
-                    context.tr(LocaleKeys.total_revenue),
-                    flex: 2,
-                  ),
+                  _buildHeaderCell('ID', flex: 1),
+                  _buildHeaderCell('Product name', flex: 4),
+                  _buildHeaderCell('Sold amount', flex: 2),
+                  _buildHeaderCell('Total revenue', flex: 2),
                 ],
               ),
             ),
@@ -218,10 +210,7 @@ class SoldProductsPage extends StatelessWidget {
                       children: [
                         _buildDataCell('#${index + 1}', flex: 1),
                         _buildDataCell(
-                          product.titleData?.getTitle(
-                                context.locale.languageCode,
-                              ) ??
-                              'N/A',
+                          product.titleData?.en ?? 'N/A',
                           flex: 4,
                           isBold: true,
                         ),

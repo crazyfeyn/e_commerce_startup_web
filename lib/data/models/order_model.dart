@@ -13,6 +13,7 @@ class OrderModel {
   final String receiverName;
   final List<OrderProductModel> products; // changed from List<ProductModel>
   final DateTime createdAt;
+  final String? additionalInfo;
 
   OrderModel({
     required this.orderId,
@@ -26,6 +27,7 @@ class OrderModel {
     required this.receiverName,
     required this.products,
     required this.createdAt,
+    required this.additionalInfo,
   });
 
   factory OrderModel.fromJson(Map<String, dynamic> json) {
@@ -45,6 +47,7 @@ class OrderModel {
               .toList() ??
           [],
       createdAt: DateTime.tryParse(json['createdAt'] ?? '') ?? DateTime.now(),
+      additionalInfo: json['additionalInfo'],
     );
   }
 
@@ -61,6 +64,7 @@ class OrderModel {
       'receiverName': receiverName,
       'products': products.map((e) => e.toJson()).toList(),
       'createdAt': createdAt.toIso8601String(),
+      'additionalInfo': additionalInfo,
     };
   }
 }

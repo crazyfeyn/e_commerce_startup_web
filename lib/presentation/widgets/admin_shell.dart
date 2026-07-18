@@ -1,13 +1,12 @@
 import 'package:e_commerce_startup_web/config/router/navigation_service.dart';
 import 'package:e_commerce_startup_web/core/utils/app_colors.dart';
 import 'package:e_commerce_startup_web/core/utils/app_styles.dart';
-import 'package:e_commerce_startup_web/core/utils/locale_keys.g.dart';
+import 'package:e_commerce_startup_web/presentation/pages/barcode/page/barcode_page.dart';
 import 'package:e_commerce_startup_web/presentation/pages/categories/page/categories_page.dart';
 import 'package:e_commerce_startup_web/presentation/pages/chat/page/chat_page.dart';
 import 'package:e_commerce_startup_web/presentation/pages/sold_products/page/sold_products.dart';
 import 'package:e_commerce_startup_web/presentation/pages/orders/page/orders_page.dart';
 import 'package:e_commerce_startup_web/presentation/pages/products/page/products_page.dart';
-import 'package:easy_localization/easy_localization.dart';
 import 'package:easy_sidemenu/easy_sidemenu.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
@@ -51,9 +50,7 @@ class _AdminShellState extends State<AdminShell> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: kIsWeb
-          ? null
-          : AppBar(title: Text(context.tr(LocaleKeys.admin_panel))),
+      appBar: kIsWeb ? null : AppBar(title: Text('Admin Panel')),
       body: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -62,10 +59,7 @@ class _AdminShellState extends State<AdminShell> {
             title: kIsWeb
                 ? Container(
                     padding: EdgeInsets.symmetric(vertical: 24, horizontal: 12),
-                    child: Text(
-                      context.tr(LocaleKeys.admin_panel),
-                      style: AppStyles.bodyXLSemibold,
-                    ),
+                    child: Text('Admin Panel', style: AppStyles.bodyXLSemibold),
                   )
                 : null,
             style: SideMenuStyle(
@@ -82,22 +76,22 @@ class _AdminShellState extends State<AdminShell> {
             ),
             items: [
               SideMenuItem(
-                title: context.tr(LocaleKeys.menu_orders),
+                title: 'Orders',
                 onTap: onChanged,
                 icon: Icon(Icons.shopping_cart),
               ),
               SideMenuItem(
-                title: context.tr(LocaleKeys.menu_categories),
+                title: 'Categories',
                 onTap: onChanged,
                 icon: Icon(Icons.category),
               ),
               SideMenuItem(
-                title: context.tr(LocaleKeys.menu_products),
+                title: 'Products',
                 onTap: onChanged,
                 icon: Icon(Icons.inventory),
               ),
               SideMenuItem(
-                title: context.tr(LocaleKeys.menu_sold_products),
+                title: 'Sold products',
                 onTap: onChanged,
                 icon: Icon(Icons.location_city),
               ),
@@ -105,6 +99,11 @@ class _AdminShellState extends State<AdminShell> {
                 title: 'HilolMate',
                 onTap: onChanged,
                 icon: Icon(CupertinoIcons.sparkles),
+              ),
+              SideMenuItem(
+                title: 'Barcode',
+                onTap: onChanged,
+                icon: const Icon(CupertinoIcons.barcode),
               ),
             ],
           ),
@@ -127,6 +126,7 @@ class _AdminShellState extends State<AdminShell> {
       2 => ProductsPage.path,
       3 => SoldProductsPage.path,
       4 => ChatPage.path,
+      5 => BarcodePage.path,
       _ => OrdersPage.path,
     };
   }
@@ -137,6 +137,8 @@ class _AdminShellState extends State<AdminShell> {
       final p when p.startsWith(CategoriesPage.path) => 1,
       final p when p.startsWith(ProductsPage.path) => 2,
       final p when p.startsWith(SoldProductsPage.path) => 3,
+      final p when p.startsWith(ChatPage.path) => 4,
+      final p when p.startsWith(BarcodePage.path) => 5,
       _ => 0,
     };
   }

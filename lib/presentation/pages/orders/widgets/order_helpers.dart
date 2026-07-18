@@ -1,18 +1,25 @@
-import 'package:e_commerce_startup_web/core/utils/locale_keys.g.dart';
-import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 
-// Real backend statuses: NEW, PAYMENT_CREATED, PAYMENT_FAILED, PAYMENT_SUCCEEDED, CANCELLED, DONE, PROCESSING (rare)
 Color getStatusColor(String status) {
   switch (status.toUpperCase()) {
     case 'NEW':
       return Colors.orange.shade50;
+    case 'WAITING':
+      return Colors.amber.shade50;
+    case 'CONFIRMED':
+      return Colors.indigo.shade50;
     case 'PAYMENT_CREATED':
       return Colors.blue.shade50;
+    case 'PAYMENT_PENDING':
+      return Colors.cyan.shade50;
     case 'PAYMENT_FAILED':
       return Colors.red.shade50;
     case 'PAYMENT_SUCCEEDED':
       return Colors.green.shade50;
+    case 'DELIVERED':
+      return Colors.teal.shade50;
+    case 'COMPLETED':
+      return Colors.teal.shade50;
     case 'CANCELLED':
       return Colors.red.shade50;
     case 'DONE':
@@ -28,12 +35,22 @@ Color getStatusTextColor(String status) {
   switch (status.toUpperCase()) {
     case 'NEW':
       return Colors.orange.shade700;
+    case 'WAITING':
+      return Colors.amber.shade700;
+    case 'CONFIRMED':
+      return Colors.indigo.shade700;
     case 'PAYMENT_CREATED':
       return Colors.blue.shade700;
+    case 'PAYMENT_PENDING':
+      return Colors.cyan.shade700;
     case 'PAYMENT_FAILED':
       return Colors.red.shade700;
     case 'PAYMENT_SUCCEEDED':
       return Colors.green.shade700;
+    case 'DELIVERED':
+      return Colors.teal.shade700;
+    case 'COMPLETED':
+      return Colors.teal.shade700;
     case 'CANCELLED':
       return Colors.red.shade700;
     case 'DONE':
@@ -45,40 +62,49 @@ Color getStatusTextColor(String status) {
   }
 }
 
-String getStatusText(BuildContext context, String status) {
+String getStatusText(String status) {
   switch (status.toUpperCase()) {
     case 'NEW':
-      return context.tr(LocaleKeys.status_new);
+      return 'New';
+    case 'WAITING':
+      return 'Pending';
+    case 'CONFIRMED':
+      return 'Confirmed';
     case 'PAYMENT_CREATED':
-      return context.tr(LocaleKeys.status_payment_created);
+      return 'Payment created';
+    case 'PAYMENT_PENDING':
+      return 'Pending';
     case 'PAYMENT_FAILED':
-      return context.tr(LocaleKeys.status_payment_failed);
+      return 'Payment failed';
     case 'PAYMENT_SUCCEEDED':
-      return context.tr(LocaleKeys.status_payment_succeeded);
+      return 'Payment succeeded';
+    case 'DELIVERED':
+      return 'Delivered';
+    case 'COMPLETED':
+      return 'Completed';
     case 'CANCELLED':
-      return context.tr(LocaleKeys.status_cancelled);
+      return 'Cancelled';
     case 'DONE':
-      return context.tr(LocaleKeys.status_done);
+      return 'Done';
     case 'PROCESSING':
-      return context.tr(LocaleKeys.status_processing);
+      return 'Processing';
     default:
       return status;
   }
 }
 
-String getPaymentMethodText(BuildContext context, String method) {
-  // Backend payment method enum: CARD, VIRTUAL_ACCOUNT, MOBILE_PHONE, TRANSFER, FOREIGN_EASY_PAY
+String getPaymentMethodText(String method) {
   switch (method.toUpperCase()) {
     case 'CARD':
-      return context.tr(LocaleKeys.payment_card);
+      return 'Card';
     case 'VIRTUAL_ACCOUNT':
-      return context.tr(LocaleKeys.payment_virtual_account);
+      return 'Virtual account';
     case 'MOBILE_PHONE':
-      return context.tr(LocaleKeys.payment_mobile_phone);
+      return 'Mobile phone';
     case 'TRANSFER':
-      return context.tr(LocaleKeys.payment_transfer);
+      return 'Bank transfer';
     case 'FOREIGN_EASY_PAY':
-      return context.tr(LocaleKeys.payment_foreign_easy_pay);
+      return 'Foreign easy payment';
     default:
       return method;
   }

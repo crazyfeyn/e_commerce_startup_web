@@ -1,8 +1,6 @@
 import 'dart:io';
 
-import 'package:e_commerce_startup_web/core/utils/locale_keys.g.dart';
 import 'package:e_commerce_startup_web/data/datasources/network/network_helper.dart';
-import 'package:easy_localization/easy_localization.dart';
 import 'package:dio/dio.dart';
 
 class NetworkService {
@@ -50,12 +48,12 @@ class NetworkService {
       throw NetworkException.fromDioError(e);
     } on SocketException catch (_) {
       throw NetworkException(
-        LocaleKeys.check_internet_connection.tr(),
+        "Check internet connection",
         NetworkExceptionType.noInternet,
       );
     } catch (e) {
       throw NetworkException(
-        LocaleKeys.dio_unknown_message.tr(args: [e.toString()]),
+        "Unknown error: ${e.toString()}",
         NetworkExceptionType.unknown,
       );
     }
@@ -79,12 +77,12 @@ class NetworkService {
       throw NetworkException.fromDioError(e);
     } on SocketException catch (_) {
       throw NetworkException(
-        LocaleKeys.check_internet_connection.tr(),
+        "Check internet connection",
         NetworkExceptionType.noInternet,
       );
     } catch (e) {
       throw NetworkException(
-        LocaleKeys.dio_unknown_message.tr(args: [e.toString()]),
+        "Unknown error: ${e.toString()}",
         NetworkExceptionType.unknown,
       );
     }
@@ -108,12 +106,12 @@ class NetworkService {
       throw NetworkException.fromDioError(e);
     } on SocketException catch (_) {
       throw NetworkException(
-        LocaleKeys.check_internet_connection.tr(),
+        "Check internet connection",
         NetworkExceptionType.noInternet,
       );
     } catch (e) {
       throw NetworkException(
-        LocaleKeys.dio_unknown_message.tr(args: [e.toString()]),
+        "Unknown error: ${e.toString()}",
         NetworkExceptionType.unknown,
       );
     }
@@ -135,12 +133,12 @@ class NetworkService {
       throw NetworkException.fromDioError(e);
     } on SocketException catch (_) {
       throw NetworkException(
-        LocaleKeys.check_internet_connection.tr(),
+        "Check internet connection",
         NetworkExceptionType.noInternet,
       );
     } catch (e) {
       throw NetworkException(
-        LocaleKeys.dio_unknown_message.tr(args: [e.toString()]),
+        "Unknown error: ${e.toString()}",
         NetworkExceptionType.unknown,
       );
     }
@@ -173,7 +171,13 @@ class NetworkService {
       "/api/v1/file/download?identity=$identity";
   static final String apiFetchOrders = "/api/v1/admin/order/get-all";
   static final String apiConfirmOrder = "/api/v1/order/confirm";
+  static final String apiEditOrderStatus = "/api/v1/admin/order/edit-status";
   static const String apiChat = '/api/chat';
+
+  static final String apiCreateBarcodeProduct =
+      '/api/v1/admin/barcode/product/create';
+  static final String apiLookupBarcodeProduct =
+      '/api/v1/barcode/product/lookup';
 
   /* Http Params */
   static Map<String, dynamic> paramsLogin(String phone, String password) {
@@ -214,5 +218,24 @@ class NetworkService {
 
   static Map<String, dynamic> paramsEditProduct(int productId) {
     return {"productId": productId};
+  }
+
+  // ── Barcode params ─────────────────────────────────────
+  static Map<String, dynamic> paramsCreateBarcodeProduct({
+    required String barcode,
+    required String nameEn,
+    required List<String> ingredients,
+    required bool isHalal,
+  }) {
+    return {
+      'barcode': barcode,
+      'nameEn': nameEn,
+      'ingredients': ingredients,
+      'isHalal': isHalal,
+    };
+  }
+
+  static Map<String, dynamic> paramsLookupBarcodeProduct(String code) {
+    return {'code': code};
   }
 }

@@ -1,4 +1,5 @@
 import 'package:e_commerce_startup_web/data/datasources/database/db_service.dart';
+import 'package:e_commerce_startup_web/presentation/pages/barcode/page/barcode_page.dart';
 import 'package:e_commerce_startup_web/presentation/pages/categories/page/categories_page.dart';
 import 'package:e_commerce_startup_web/presentation/pages/chat/page/chat_page.dart';
 import 'package:e_commerce_startup_web/presentation/pages/sold_products/page/sold_products.dart';
@@ -65,6 +66,10 @@ class AppRouter {
           GoRoute(
             path: ChatPage.path,
             builder: (context, state) => const ChatPage(),
+          ),
+          GoRoute(
+            path: BarcodePage.path,
+            builder: (_, __) => const BarcodePage(),
           ),
         ],
       ),

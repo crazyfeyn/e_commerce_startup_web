@@ -1,8 +1,6 @@
 import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:e_commerce_startup_web/core/utils/app_colors.dart';
 import 'package:e_commerce_startup_web/core/utils/app_styles.dart';
-import 'package:e_commerce_startup_web/core/utils/locale_keys.g.dart';
-import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 
 class CustomDropDownMenu extends StatefulWidget {
@@ -84,7 +82,7 @@ class _CustomDropDownMenuState extends State<CustomDropDownMenu> {
           initialValue: selectItem?.id,
           validator: (value) {
             if (value == null) {
-              return context.tr(LocaleKeys.empty_filed);
+              return 'This field is required';
             }
             return null;
           },
